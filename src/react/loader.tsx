@@ -189,25 +189,29 @@ export default function Loader() {
         </div>
       </Modal>
       <footer className=" mt-[200px] max-w-[1000px] mx-auto">
-        <p className=" my-3">
-          NOTE - samples are loaded when the key is released - so it will only
-          play on the 2nd time a button is pushed. For now this is not a bug,
-          but optimisation shortcut.
-        </p>
         <p>
           DO NOT USE WITH BLUETOOTH, only wired speakers. BT speakers can add
           extra delay and ruin the responsiveness.
         </p>
-        <p>Made for the web & OS - </p>
         <p className=" my-3 text-center">
-          Made for the web & OS, with 💙, by Britnell - &nbsp;
+          Made open-source with 💙 for the web, by &nbsp;
+          <a
+            href="https://britnell.github.io/portfolio/about/"
+            target="_blank"
+            rel="noreferrer"
+            className=" underline"
+          >
+            Britnell
+          </a>
+          - &nbsp;
+          <br />
           <a
             href="https://github.com/Britnell/astro-gym/blob/main/src/react/loader.tsx"
             target="_blank"
             rel="noreferrer"
             className=" underline"
           >
-            see github
+            code on github
           </a>{" "}
           - feedback welcome
         </p>

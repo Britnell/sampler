@@ -82,6 +82,18 @@ export default function Song({
     };
   }, [samples, buffer, speed]);
 
+  useEffect(() => {
+    // auto pre-load samples
+    const keys = Object.values(samples).filter(
+      (sm) => sm.bufferid === bufferId
+    );
+    keys.forEach((smp) => {
+      const s = parseFloat(speed);
+      const source = loadSource(buffer, isNaN(s) ? 1.0 : s);
+      sources.current[smp.key] = source;
+    });
+  }, [samples, speed]);
+
   return (
     <div className="song px-8 my-40">
       <div>
