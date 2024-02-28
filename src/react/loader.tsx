@@ -5,8 +5,8 @@ import Player from "./player";
   TODO
   -X delete key modal
   -X copy key
-  - sample speed
-  - sample edit (popup arrowkeys move beginning)
+  -X sample speed
+  - sample edit modal (popup arrowkeys move beginning)
   - click to seek
   - zoom waveform
   - [ ] Set sample length & play until end
@@ -26,6 +26,7 @@ export const loadSource = (buffer: AudioBuffer | void, speed: number = 1.0) => {
 
 export default function Loader() {
   const [buffers, setBuffers] = useState<BufferState>({});
+  const [demo, setDemo] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     // load files from db
@@ -80,10 +81,7 @@ export default function Loader() {
     samplesDbRemove(bufferid);
   };
 
-  const loadFromUrl = async (ev: FormEvent) => {
-    ev.preventDefault();
-    const uri = (ev.target as HTMLFormElement).url.value;
-    console.log({ uri });
+  const loadUri = async (uri: string) => {
     const blob = await fetch(uri).then((res) => res.blob());
     const arrayBuffer = await blob.arrayBuffer();
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
@@ -91,15 +89,28 @@ export default function Loader() {
     await samplesDbWrite(blob, uri).catch((err) => console.error(err));
   };
 
+  const loadFromUrl = async (ev: FormEvent) => {
+    ev.preventDefault();
+    const uri = (ev.target as HTMLFormElement).url.value;
+    loadUri(uri);
+  };
+
+  const loadDemo = async () => {
+    if (!selectedDemo) return;
+    loadUri(selectedDemo.url);
+  };
+
+  const selectedDemo = demoSamples.find((d) => d.name === demo);
+
   return (
     <>
       <header className=" max-w-[1000px] mx-auto">
         <h1 className=" my-2 text-2xl">Audio-Sampler</h1>
-        <div className=" mt-4">
-          <h2 className=" text-xl">Add source files</h2>
-          <div className=" grid grid-cols-2 gap-10">
-            <label className=" flex gap-y-2 flex-col ">
-              <span>load local file :</span>
+        <h2 className=" mt-8 text-xl pl-4">Add source files</h2>
+        <div className="  p-4 bg-[#282dbd] bg-opacity-5">
+          <div className=" grid grid-cols-3 gap-10">
+            <label>
+              <span className=" mb-3 block">load local file :</span>
               <input
                 type="file"
                 accept="audio/mp3"
@@ -109,16 +120,59 @@ export default function Loader() {
                 }}
               />
             </label>
-            <label className=" flex gap-y-2 flex-col ">
-              <span>load from url :</span>
+            <label>
+              <span className=" mb-3 block">load from url :</span>
               <form onSubmit={loadFromUrl}>
                 <input
                   type="text"
                   name="url"
                   className=" bg-transparent border border-[var(--b2)] "
                 />
-                <button>load</button>
+                <button className=" bg-white text-[var(--bg)]">load</button>
               </form>
+            </label>
+            <label htmlFor="">
+              <span className=" mb-3 block">Load demo sample :</span>
+              <div>
+                <select
+                  name="demo"
+                  className=" bg-[var(--bg)] text-white w-[180px] inline-block "
+                  // onChange={()=>}
+                  value={demo}
+                  onChange={(ev) => setDemo(ev.target.value)}
+                >
+                  <option value=""></option>
+                  {demoSamples.map((demo, i) => (
+                    <option key={i} value={demo.name}>
+                      {demo.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  className=" bg-white text-[var(--bg)]"
+                  onClick={loadDemo}
+                >
+                  load
+                </button>
+              </div>
+              {selectedDemo && (
+                <p className=" text-sm mt-2 ">
+                  demo &nbsp;
+                  <a
+                    className=" underline"
+                    href={selectedDemo.source}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    source
+                  </a>
+                  &nbsp;
+                </p>
+              )}
+              {/* <p>
+                ( samples from{" "}
+                )
+              </p> */}
             </label>
           </div>
         </div>
@@ -261,3 +315,18 @@ declare global {
 }
 
 export type BufferState = { [name: string]: AudioBuffer };
+
+const demoSamples = [
+  {
+    name: "The Father, The Son, and The Harold Rubin",
+    url: "/The-Harold-Rubin.mp3",
+    source:
+      "https://freemusicarchive.org/music/Harold_Rubin_Ehran_Elisha__Haim_Elisha/East_Of_Jaffa/02_East_Of_Jaffa_-_The_Father_The/",
+  },
+  {
+    name: "Song for Bilbao",
+    url: "/songforbilbao.mp3",
+    source:
+      "https://freemusicarchive.org/music/Jazz_at_Mladost_Club/Jazz_Night/Song_for_Bilbao/",
+  },
+];
