@@ -82,11 +82,14 @@ export default function Loader() {
   };
 
   const loadUri = async (uri: string) => {
+    console.log(" LOAD", uri);
+
     const blob = await fetch(uri).then((res) => res.blob());
     const arrayBuffer = await blob.arrayBuffer();
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
     setBuffers((s) => ({ ...s, [uri]: audioBuffer }));
     await samplesDbWrite(blob, uri).catch((err) => console.error(err));
+    console.log(" DONE");
   };
 
   const loadFromUrl = async (ev: FormEvent) => {
