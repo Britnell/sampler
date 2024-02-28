@@ -92,7 +92,7 @@ export default function Loader() {
   };
 
   return (
-    <div>
+    <>
       <header className=" max-w-[1000px] mx-auto">
         <h1 className=" my-2 text-2xl">Audio-Sampler</h1>
         <div className=" mt-4">
@@ -123,7 +123,9 @@ export default function Loader() {
           </div>
         </div>
       </header>
-      <Player buffers={buffers} removeBuffer={removeBuffer} />
+      <main>
+        <Player buffers={buffers} removeBuffer={removeBuffer} />
+      </main>
       <footer className=" mt-[200px] max-w-[1000px] mx-auto">
         <p className=" my-3">
           NOTE - samples are loaded when the key is released - so it will only
@@ -148,7 +150,7 @@ export default function Loader() {
           - feedback welcome
         </p>
       </footer>
-    </div>
+    </>
   );
 }
 

@@ -1,5 +1,5 @@
 ---
-import Loader from "../react/loader";
+
 ---
 
 <!doctype html>
@@ -7,7 +7,7 @@ import Loader from "../react/loader";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Sampler</title>
   </head>
 
   <style is:global>
@@ -20,6 +20,6 @@ import Loader from "../react/loader";
     }
   </style>
   <body>
-    <Loader client:only="react" />
+    <slot />
   </body>
 </html>

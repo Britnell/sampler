@@ -114,7 +114,7 @@ export default function Player({
   const closeModal = () => setModal(null);
 
   return (
-    <main className=" min-h-[calc(100vh-600px)]">
+    <div className=" min-h-[calc(100vh-600px)]">
       {Object.entries(buffers).map(([name, buffer]) => (
         <Song
           key={name}
@@ -169,7 +169,7 @@ export default function Player({
         )}
       </Modal>
       {/* <button onClick={() => {}}>click</button> */}
-    </main>
+    </div>
   );
 }
 
