@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import Player from "./player";
+import Player, { Modal } from "./player";
 
 /* 
   TODO
@@ -27,6 +27,7 @@ export const loadSource = (buffer: AudioBuffer | void, speed: number = 1.0) => {
 export default function Loader() {
   const [buffers, setBuffers] = useState<BufferState>({});
   const [demo, setDemo] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // load files from db
@@ -38,6 +39,7 @@ export default function Loader() {
       if (!blobs) return;
 
       const srcs: BufferState = {};
+      setLoading(true);
       await Promise.all(
         Object.entries(blobs).map(async ([name, blob]) => {
           // load array from blob
@@ -51,6 +53,7 @@ export default function Loader() {
         })
       );
 
+      setLoading(false);
       setBuffers(srcs);
     };
     load();
@@ -59,6 +62,7 @@ export default function Loader() {
   const loadFile = (file: File | undefined) => {
     if (!file) return;
 
+    setLoading(true);
     const reader = new FileReader();
     reader.onload = async (ev) => {
       // Load buffer
@@ -69,6 +73,7 @@ export default function Loader() {
       // store in db
       const blob = new Blob([file], { type: file.type });
       await samplesDbWrite(blob, file.name).catch((err) => console.error(err));
+      setLoading(false);
     };
     reader.readAsArrayBuffer(file);
   };
@@ -82,14 +87,13 @@ export default function Loader() {
   };
 
   const loadUri = async (uri: string) => {
-    console.log(" LOAD", uri);
-
+    setLoading(true);
     const blob = await fetch(uri).then((res) => res.blob());
     const arrayBuffer = await blob.arrayBuffer();
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
     setBuffers((s) => ({ ...s, [uri]: audioBuffer }));
     await samplesDbWrite(blob, uri).catch((err) => console.error(err));
-    console.log(" DONE");
+    setLoading(false);
   };
 
   const loadFromUrl = async (ev: FormEvent) => {
@@ -172,10 +176,6 @@ export default function Loader() {
                   &nbsp;
                 </p>
               )}
-              {/* <p>
-                ( samples from{" "}
-                )
-              </p> */}
             </label>
           </div>
         </div>
@@ -183,6 +183,11 @@ export default function Loader() {
       <main>
         <Player buffers={buffers} removeBuffer={removeBuffer} />
       </main>
+      <Modal isOpen={loading}>
+        <div className=" bg-[var(--b2)]">
+          <p className=" text-3xl">LOADING....</p>
+        </div>
+      </Modal>
       <footer className=" mt-[200px] max-w-[1000px] mx-auto">
         <p className=" my-3">
           NOTE - samples are loaded when the key is released - so it will only
@@ -328,7 +333,7 @@ const demoSamples = [
   },
   {
     name: "Song for Bilbao",
-    url: "/songforbilbao.mp3",
+    url: "/Song-for-Bilbao.mp3",
     source:
       "https://freemusicarchive.org/music/Jazz_at_Mladost_Club/Jazz_Night/Song_for_Bilbao/",
   },

@@ -173,7 +173,7 @@ export default function Player({
   );
 }
 
-const Modal = ({
+export const Modal = ({
   children,
   isOpen,
   onClose,
