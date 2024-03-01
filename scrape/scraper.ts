@@ -12,10 +12,9 @@ const getPage = async (x: number) => {
   const url = loclabs + collections[x].href;
   const page = await fetch(url).then((res) => res.text());
   const files = getPageFiles(page);
-  console.log(x, url, files.length);
-
   const file = Bun.file(`./scrape/${collections[x].name}.txt`);
   await Bun.write(file, JSON.stringify(files));
+  console.log(x, url, files.length);
 };
 
 // for (let x = 0; x < collections.length; x++) {
