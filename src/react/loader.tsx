@@ -138,45 +138,19 @@ export default function Loader() {
                 <button className=" bg-white text-[var(--bg)]">load</button>
               </form>
             </label>
-            <label htmlFor="">
-              <span className=" mb-3 block">Load demo sample :</span>
-              <div>
-                <select
-                  name="demo"
-                  className=" bg-[var(--bg)] text-white w-[180px] inline-block "
-                  // onChange={()=>}
-                  value={demo}
-                  onChange={(ev) => setDemo(ev.target.value)}
-                >
-                  <option value=""></option>
-                  {demoSamples.map((demo, i) => (
-                    <option key={i} value={demo.name}>
-                      {demo.name}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  className=" bg-white text-[var(--bg)]"
-                  onClick={loadDemo}
-                >
-                  load
-                </button>
-              </div>
-              {selectedDemo && (
-                <p className=" text-sm mt-2 ">
-                  demo &nbsp;
-                  <a
-                    className=" underline"
-                    href={selectedDemo.source}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    source
-                  </a>
-                  &nbsp;
-                </p>
-              )}
-            </label>
+            <div>
+              <p>
+                Play rhythm roulette & get a random song for the LOC records
+              </p>
+              <a
+                href="/api/random"
+                className="underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Random
+              </a>
+            </div>
           </div>
         </div>
       </header>
