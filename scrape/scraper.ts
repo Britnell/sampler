@@ -1,14 +1,12 @@
 import { getPageFiles, listCollections } from "./parts";
-import { pageHtml } from "./test";
-import { $ } from "bun";
+// import { pageHtml } from "./test";
 
 const collections = listCollections();
 console.log(collections.map((c, x) => ({ ...c, x })));
 
-// const samples = getPageFiles(pageHtml);
-// console.log(samples.length);
-
 const loclabs = "https://citizen-dj.labs.loc.gov";
+
+declare var Bun: any;
 
 const getPage = async (x: number) => {
   const url = loclabs + collections[x].href;
