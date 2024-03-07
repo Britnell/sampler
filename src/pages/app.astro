@@ -1,8 +1,8 @@
 ---
-import Loader from "../react/loader";
+import AppC from "../vue/app.vue";
 import Page from "../comp/page.astro";
 ---
 
 <Page>
-  <Loader client:only="react" />
+  <AppC client:only="vue" />
 </Page>
