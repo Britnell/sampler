@@ -26,7 +26,6 @@ export const loadSource = (buffer: AudioBuffer | void, speed: number = 1.0) => {
 
 export default function Loader() {
   const [buffers, setBuffers] = useState<BufferState>({});
-  const [demo, setDemo] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -101,13 +100,6 @@ export default function Loader() {
     const uri = (ev.target as HTMLFormElement).url.value;
     loadUri(uri);
   };
-
-  const loadDemo = async () => {
-    if (!selectedDemo) return;
-    loadUri(selectedDemo.url);
-  };
-
-  const selectedDemo = demoSamples.find((d) => d.name === demo);
 
   return (
     <>
@@ -215,7 +207,6 @@ async function getDbStore(): Promise<IDBObjectStore | string> {
         console.error(ev);
         reject("transaction error ");
       };
-
       const objectStore = transaction.objectStore(STORE_NAME);
       resolve(objectStore);
     };
@@ -301,18 +292,3 @@ declare global {
 }
 
 export type BufferState = { [name: string]: AudioBuffer };
-
-const demoSamples = [
-  {
-    name: "The Father, The Son, and The Harold Rubin",
-    url: "/The-Harold-Rubin.mp3",
-    source:
-      "https://freemusicarchive.org/music/Harold_Rubin_Ehran_Elisha__Haim_Elisha/East_Of_Jaffa/02_East_Of_Jaffa_-_The_Father_The/",
-  },
-  {
-    name: "Song for Bilbao",
-    url: "/Song-for-Bilbao.mp3",
-    source:
-      "https://freemusicarchive.org/music/Jazz_at_Mladost_Club/Jazz_Night/Song_for_Bilbao/",
-  },
-];
