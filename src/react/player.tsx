@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { BufferState } from "./loader";
 import Song from "./song";
 import { useLocalStorageState } from "./hooks";
+import { Modal } from "./Modal";
 
 export default function Player({
   buffers,
@@ -173,32 +174,6 @@ export default function Player({
     </div>
   );
 }
-
-export const Modal = ({
-  children,
-  isOpen,
-  onClose,
-}: {
-  children: ReactNode;
-  isOpen: boolean;
-  onClose?: () => void;
-}) => {
-  const ref = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    if (isOpen) ref.current.showModal();
-    else ref.current.close();
-
-    const callback = () => {
-      if (onClose) onClose();
-    };
-    ref.current.addEventListener("close", callback);
-    return () => ref.current?.removeEventListener("close", callback);
-  }, [isOpen]);
-
-  return <dialog ref={ref}>{children}</dialog>;
-};
 
 const limit = (x: number, min: number, max: number) => {
   if (x < min) return min;
