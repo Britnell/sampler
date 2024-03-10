@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import type { BufferState } from "./loader";
 import Song from "./song";
 import { useLocalStorageState } from "./hooks";
 import { Modal } from "./Modal";
+import type { BufferState } from "./app";
 
 export default function Player({
   buffers,
