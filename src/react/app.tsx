@@ -6,21 +6,19 @@ import { Modal } from "./Modal";
 
 export type BufferState = { [name: string]: AudioBuffer };
 
-export type SamplesT = {
-  [id: string]: SampleT;
-};
-
 export type SampleT = {
   key: string;
   begin: number;
   active: boolean;
   bufferid: string;
 };
+export type SamplesT = {
+  [id: string]: SampleT | null;
+};
 
 export default function App() {
   const [buffers, setBuffers] = useState<BufferState>({});
   const [loading, setLoading] = useState(false);
-  const [edit, setEdit] = useState("");
   const [samples, setSamples] = useLocalStorageState<SamplesT>(
     "sample-keys",
     {}
@@ -39,9 +37,9 @@ export default function App() {
       <header>
         <h1 className=" my-2 text-2xl">Audio-Sampler</h1>
       </header>
-      <main className=" ">
+      <main className=" h-[calc(100vh-60px)] grid grid-rows-[1fr_300px] gap-10 ">
         <section>
-          <Loader setBuffers={setBuffers} />
+          <Loader setBuffers={setBuffers} setLoading={setLoading} />
           <div>
             <h2>Sources</h2>
             <ul className=" list-disc pl-5">
@@ -68,9 +66,11 @@ export default function App() {
 export function Loader({
   // buffers,
   setBuffers,
+  setLoading,
 }: {
   // buffers: BufferState;
   setBuffers: React.Dispatch<React.SetStateAction<BufferState>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   useEffect(() => {
     // load files from db
@@ -82,7 +82,7 @@ export function Loader({
       if (!blobs) return;
 
       const srcs: BufferState = {};
-      // setLoading(true);
+      setLoading(true);
       await Promise.all(
         Object.entries(blobs).map(async ([name, blob]) => {
           // load array from blob
@@ -93,7 +93,7 @@ export function Loader({
         })
       );
 
-      // setLoading(false);
+      setLoading(false);
       setBuffers(srcs);
     };
     load();
@@ -101,7 +101,7 @@ export function Loader({
 
   const loadFile = (file: File | undefined) => {
     if (!file) return;
-    // setLoading(true);
+    setLoading(true);
     const reader = new FileReader();
     reader.onload = async (ev) => {
       const arrayBuffer = ev.target?.result as ArrayBuffer;
@@ -111,7 +111,7 @@ export function Loader({
       // store in db
       const blob = new Blob([file], { type: file.type });
       await samplesDbWrite(blob, file.name).catch((err) => console.error(err));
-      // setLoading(false);
+      setLoading(false);
     };
     reader.readAsArrayBuffer(file);
   };
@@ -120,10 +120,10 @@ export function Loader({
     ev.preventDefault();
     const uri = (ev.target as HTMLFormElement).url.value;
     const { audioBuffer, blob } = await loadUriBuffer(uri);
-    // setLoading(true);
+    setLoading(true);
     setBuffers((s) => ({ ...s, [uri]: audioBuffer }));
     await samplesDbWrite(blob, uri).catch((err) => console.error(err));
-    // setLoading(false);
+    setLoading(false);
   };
 
   return (
@@ -204,7 +204,13 @@ const Keyboard = ({ samples }: { samples: SamplesT }) => {
   );
 };
 
-const Key = ({ letter, sample }: { letter: string; sample: SampleT }) => {
+const Key = ({
+  letter,
+  sample,
+}: {
+  letter: string;
+  sample: SampleT | null;
+}) => {
   return (
     <button className=" w-[9vw] border border-white aspect-square">
       {letter}
