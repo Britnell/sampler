@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocalStorageState, type SamplesT } from "./player";
 import { SampleWave, Wave, findmax } from "./viz";
-import { audioContext, loadSource } from "./loader";
+import { loadBufferSource, startNow } from "./audio";
+import { useLocalStorageState } from "./hooks";
 
 const keybounce: { [id: string]: boolean } = {};
 
@@ -56,7 +56,7 @@ export default function Song({
       if (!sample?.active) return; // not a sample key
       if (sample.bufferid !== bufferId) return; // not for this sample
       // play
-      sources.current[key]?.start(audioContext.currentTime, samples[key].begin);
+      sources.current[key]?.start(startNow(), samples[key].begin);
       keybounce[key] = true;
     };
 
@@ -68,7 +68,7 @@ export default function Song({
       sources.current[key]?.stop();
       // load next
       const s = parseFloat(speed);
-      const source = loadSource(buffer, isNaN(s) ? 1.0 : s);
+      const source = loadBufferSource(buffer, isNaN(s) ? 1.0 : s);
       sources.current[key] = source;
       keybounce[key] = false;
     };
@@ -89,7 +89,7 @@ export default function Song({
     );
     keys.forEach((smp) => {
       const s = parseFloat(speed);
-      const source = loadSource(buffer, isNaN(s) ? 1.0 : s);
+      const source = loadBufferSource(buffer, isNaN(s) ? 1.0 : s);
       sources.current[smp.key] = source;
     });
   }, [samples, speed]);
@@ -205,3 +205,14 @@ export default function Song({
     </div>
   );
 }
+
+export type SamplesT = {
+  [id: string]: SampleT;
+};
+
+export type SampleT = {
+  key: string;
+  begin: number;
+  active: boolean;
+  bufferid: string;
+};

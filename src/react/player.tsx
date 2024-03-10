@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { BufferState } from "./loader";
 import Song from "./song";
+import { useLocalStorageState } from "./hooks";
 
 export default function Player({
   buffers,
@@ -198,24 +199,6 @@ export const Modal = ({
 
   return <dialog ref={ref}>{children}</dialog>;
 };
-
-export function useLocalStorageState<T>(key: string, initial: T) {
-  const [state, setState] = useState<T>(() => {
-    try {
-      const str = localStorage.getItem(key);
-      if (!str) return initial;
-      return JSON.parse(str);
-    } catch (e) {
-      return initial;
-    }
-  });
-
-  useEffect(() => {
-    localStorage.setItem(key, JSON.stringify(state));
-  }, [state]);
-
-  return [state, setState] as const;
-}
 
 const limit = (x: number, min: number, max: number) => {
   if (x < min) return min;

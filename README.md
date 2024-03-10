@@ -1,3 +1,13 @@
+# sampler
+
+## v1
+
+TODO -[ ] delete key modal -[ ] copy key -[ ] sample speed
+
+- sample edit modal (popup arrowkeys move beginning)
+- click to seek
+- zoom waveform -[ ] Set sample length & play until end
+
 # Astro Starter Kit: Minimal
 
 ```sh
