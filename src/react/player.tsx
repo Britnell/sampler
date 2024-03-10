@@ -191,3 +191,11 @@ export type SampleT = {
   active: boolean;
   bufferid: string;
 };
+
+// const removeBuffer = (bufferid: string) => {
+//   const _buffers = { ...buffers };
+//   delete _buffers[bufferid];
+//   setBuffers(_buffers);
+//   // rmv in local storage
+//   samplesDbRemove(bufferid);
+// };

@@ -1,8 +1,7 @@
-import { useEffect, useState, type FormEvent } from "react";
-import { samplesDbReadAll, samplesDbRemove, samplesDbWrite } from "./indexdb";
-import { loadArrayBuffer, loadBlobBuffer, loadUriBuffer } from "./audio";
+import { useEffect, useState } from "react";
 import { useLocalStorageState } from "./hooks";
 import { Modal } from "./Modal";
+import { Loader } from "./loader";
 
 export type BufferState = { [name: string]: AudioBuffer };
 
@@ -16,6 +15,8 @@ export type SamplesT = {
   [id: string]: SampleT | null;
 };
 
+const ALLKEYS = "qwertyuiopasdfghjklzxcvbnm1234567890";
+
 export default function App() {
   const [buffers, setBuffers] = useState<BufferState>({});
   const [loading, setLoading] = useState(false);
@@ -23,14 +24,38 @@ export default function App() {
     "sample-keys",
     {}
   );
+  const [edit, setEdit] = useState("");
 
-  // const removeBuffer = (bufferid: string) => {
-  //   const _buffers = { ...buffers };
-  //   delete _buffers[bufferid];
-  //   setBuffers(_buffers);
-  //   // rmv in local storage
-  //   samplesDbRemove(bufferid);
-  // };
+  useEffect(() => {
+    const keydown = (ev: KeyboardEvent) => {
+      const { key } = ev;
+      console.log({ key });
+
+      if (ALLKEYS.includes(key)) {
+        // SAMPLE KEY
+        setEdit(key);
+      }
+
+      if (key.startsWith("Arrow")) {
+        // ARROW KEYS
+        return;
+      }
+    };
+
+    const keyup = (ev: KeyboardEvent) => {
+      const { key } = ev;
+    };
+
+    window.addEventListener("keydown", keydown);
+    window.addEventListener("keyup", keyup);
+
+    return () => {
+      window.removeEventListener("keydown", keydown);
+      window.removeEventListener("keyup", keyup);
+    };
+  }, []);
+
+  const editingSample = samples[edit];
 
   return (
     <div className=" max-w-[1000px] mx-auto">
@@ -38,19 +63,35 @@ export default function App() {
         <h1 className=" my-2 text-2xl">Audio-Sampler</h1>
       </header>
       <main className=" h-[calc(100vh-60px)] grid grid-rows-[1fr_300px] gap-10 ">
-        <section>
-          <Loader setBuffers={setBuffers} setLoading={setLoading} />
-          <div>
-            <h2>Sources</h2>
-            <ul className=" list-disc pl-5">
-              {Object.entries(buffers).map(([name, buffer]) => (
-                <li key={name}>
-                  <span className=" ">{name}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
+        {!editingSample?.active && (
+          <section>
+            <Loader setBuffers={setBuffers} setLoading={setLoading} />
+            <div>
+              <h2>Sources</h2>
+              <ul className=" list-disc pl-5">
+                {Object.entries(buffers).map(([name, buffer]) => (
+                  <li key={name}>
+                    <span className=" ">{name}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
+        {editingSample?.active && (
+          <section>
+            <div className="flex justify-between">
+              <h2>EDITIING {edit}</h2>
+              <button onClick={() => setEdit("")}>close</button>
+            </div>
+            <p>{JSON.stringify(editingSample)}</p>
+            <Preview
+              sample={editingSample}
+              bufferId={editingSample.bufferid}
+              buffer={buffers[editingSample.bufferid]}
+            />
+          </section>
+        )}
         <Keyboard samples={samples} />
       </main>
       <Modal isOpen={loading}>
@@ -63,124 +104,52 @@ export default function App() {
     </div>
   );
 }
-export function Loader({
-  // buffers,
-  setBuffers,
-  setLoading,
+
+const Preview = ({
+  bufferId,
+  buffer,
+  sample,
 }: {
-  // buffers: BufferState;
-  setBuffers: React.Dispatch<React.SetStateAction<BufferState>>;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+  bufferId: string;
+  // edit: string;
+  buffer: AudioBuffer;
+  sample: SampleT;
+  // callback: (type: string, val: any) => void;
+  // removeBuffer: (id: string) => void;
+}) => {
+  const [wavebuffer, setWavebuffer] = useState<number[] | null>(null);
   useEffect(() => {
-    // load files from db
-    const load = async () => {
-      const blobs = await samplesDbReadAll().catch((e) => {
-        console.error(e);
-        return;
-      });
-      if (!blobs) return;
+    // calc wavebuffer for viz
+    const audioData = buffer.getChannelData(0);
+    const chunkSize = buffer.sampleRate / 1000;
+    const chunks = audioData.length / chunkSize;
+    let last = 0;
 
-      const srcs: BufferState = {};
-      setLoading(true);
-      await Promise.all(
-        Object.entries(blobs).map(async ([name, blob]) => {
-          // load array from blob
-          const buffer = await loadBlobBuffer(blob);
-          if (!buffer) return;
-          srcs[name] = buffer;
-          return buffer;
-        })
-      );
+    const wave = [];
+    for (let x = 1; x < chunks; x++) {
+      const to = Math.floor(chunkSize * x);
+      const slice = audioData.slice(last, to);
+      const max = findmax(slice);
+      wave.push(max);
+      last = to + 1;
+    }
 
-      setLoading(false);
-      setBuffers(srcs);
-    };
-    load();
-  }, []);
+    setWavebuffer(wave);
+  }, [buffer]);
 
-  const loadFile = (file: File | undefined) => {
-    if (!file) return;
-    setLoading(true);
-    const reader = new FileReader();
-    reader.onload = async (ev) => {
-      const arrayBuffer = ev.target?.result as ArrayBuffer;
-      const buffer = await loadArrayBuffer(arrayBuffer);
-      if (!buffer) return;
-      setBuffers((s) => ({ ...s, [file.name]: buffer }));
-      // store in db
-      const blob = new Blob([file], { type: file.type });
-      await samplesDbWrite(blob, file.name).catch((err) => console.error(err));
-      setLoading(false);
-    };
-    reader.readAsArrayBuffer(file);
-  };
+  return <div>asdasd</div>;
+};
 
-  const loadFromUrl = async (ev: FormEvent) => {
-    ev.preventDefault();
-    const uri = (ev.target as HTMLFormElement).url.value;
-    const { audioBuffer, blob } = await loadUriBuffer(uri);
-    setLoading(true);
-    setBuffers((s) => ({ ...s, [uri]: audioBuffer }));
-    await samplesDbWrite(blob, uri).catch((err) => console.error(err));
-    setLoading(false);
-  };
-
-  return (
-    <>
-      <>
-        <section>
-          <div>
-            <h2 className=" mt-8 text-xl pl-4">Add source files</h2>
-            <div className="  p-4 bg-[#282dbd] bg-opacity-5">
-              <div className=" grid grid-cols-3 gap-10">
-                <label>
-                  <span className=" mb-3 block">load local file :</span>
-                  <input
-                    type="file"
-                    accept="audio/mp3"
-                    onChange={(ev) => {
-                      const ip = ev.target as HTMLInputElement;
-                      loadFile(ip.files?.[0]);
-                    }}
-                  />
-                </label>
-                <label>
-                  <span className=" mb-3 block">load from url :</span>
-                  <form onSubmit={loadFromUrl}>
-                    <input
-                      type="text"
-                      name="url"
-                      className=" bg-transparent border border-[var(--b2)] "
-                    />
-                    <button className=" bg-white text-[var(--bg)]">load</button>
-                  </form>
-                </label>
-                <div>
-                  <p>
-                    Play rhythm roulette & get a random song for the LOC records
-                  </p>
-                  <a
-                    href="/api/random"
-                    className="underline"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Random
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </>
-    </>
-  );
-}
+export const findmax = (arr: Float32Array | number[]) => {
+  let max = 0;
+  arr.forEach((v) => {
+    const x = Math.abs(v);
+    if (x > max) max = x;
+  });
+  return max;
+};
 
 const Keyboard = ({ samples }: { samples: SamplesT }) => {
-  console.log(samples.q);
-
   return (
     <section>
       <div className=" flex flex-col gap-1 ">
@@ -190,12 +159,12 @@ const Keyboard = ({ samples }: { samples: SamplesT }) => {
           ))}
         </div>
         <div className=" ml-[2vw] flex gap-1">
-          {"asdfghjkl;".split("").map((k) => (
+          {"asdfghjkl".split("").map((k) => (
             <Key key={k} letter={k} sample={samples[k]} />
           ))}
         </div>
         <div className=" ml-[5vw] flex gap-1">
-          {"zxcvbnm,.".split("").map((k) => (
+          {"zxcvbnm".split("").map((k) => (
             <Key key={k} letter={k} sample={samples[k]} />
           ))}
         </div>
