@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocalStorageState } from "./hooks";
 import { Modal } from "./Modal";
 import { Loader } from "./loader";
+import { SampleWave } from "./viz";
+import { StoreProvider, useDispatch, useSelector } from "./state/slive";
+import { editClose, editKey } from "./state/state";
 
 export type BufferState = { [name: string]: AudioBuffer };
 
@@ -15,26 +18,32 @@ export type SamplesT = {
   [id: string]: SampleT | null;
 };
 
-const ALLKEYS = "qwertyuiopasdfghjklzxcvbnm1234567890";
+export default function Wrapper() {
+  return (
+    <StoreProvider>
+      <App />
+    </StoreProvider>
+  );
+}
 
-export default function App() {
+export function App() {
   const [buffers, setBuffers] = useState<BufferState>({});
   const [loading, setLoading] = useState(false);
   const [samples, setSamples] = useLocalStorageState<SamplesT>(
     "sample-keys",
     {}
   );
-  const [edit, setEdit] = useState("");
+  // const [edit, setEdit] = useState("");
+  const sources = useRef<{ [id: string]: AudioBufferSourceNode | null }>({});
+  const store = useSelector((st) => st);
+  // const dispatch = useDispatch();
+
+  console.log(store);
 
   useEffect(() => {
     const keydown = (ev: KeyboardEvent) => {
       const { key } = ev;
-      console.log({ key });
-
-      if (ALLKEYS.includes(key)) {
-        // SAMPLE KEY
-        setEdit(key);
-      }
+      // console.log({ key });
 
       if (key.startsWith("Arrow")) {
         // ARROW KEYS
@@ -55,67 +64,109 @@ export default function App() {
     };
   }, []);
 
+  const { edit } = store.state;
   const editingSample = samples[edit];
 
-  return (
-    <div className=" max-w-[1000px] mx-auto">
-      <header>
-        <h1 className=" my-2 text-2xl">Audio-Sampler</h1>
-      </header>
-      <main className=" h-[calc(100vh-60px)] grid grid-rows-[1fr_300px] gap-10 ">
-        {!editingSample?.active && (
-          <section>
-            <Loader setBuffers={setBuffers} setLoading={setLoading} />
-            <div>
-              <h2>Sources</h2>
-              <ul className=" list-disc pl-5">
-                {Object.entries(buffers).map(([name, buffer]) => (
-                  <li key={name}>
-                    <span className=" ">{name}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-        )}
-        {editingSample?.active && (
-          <section>
-            <div className="flex justify-between">
-              <h2>EDITIING {edit}</h2>
-              <button onClick={() => setEdit("")}>close</button>
-            </div>
-            <p>{JSON.stringify(editingSample)}</p>
-            <Preview
-              sample={editingSample}
-              bufferId={editingSample.bufferid}
-              buffer={buffers[editingSample.bufferid]}
-            />
-          </section>
-        )}
-        <Keyboard samples={samples} />
-      </main>
-      <Modal isOpen={loading}>
-        <div className=" bg-[var(--b2)]">
-          <p className=" text-3xl">LOADING....</p>
-        </div>
-      </Modal>
+  // console.log(state);
 
-      <Footer />
-    </div>
+  return (
+    <>
+      <div className=" max-w-[1000px] mx-auto">
+        <header>
+          <h1 className=" my-2 text-2xl">Audio-Sampler</h1>
+        </header>
+        <main className=" h-[calc(100vh-60px)] grid grid-rows-[1fr_300px] gap-10 ">
+          <div className=" relative ">
+            <section>
+              <Loader setBuffers={setBuffers} setLoading={setLoading} />
+              <div className=" p-4 ">
+                <h2>Sources</h2>
+                <ul className=" list-disc pl-5">
+                  {Object.entries(buffers).map(([name, buffer]) => (
+                    <li key={name}>
+                      <span className=" ">{name}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+            {editingSample?.active && (
+              <section className=" absolute inset-0 bg-[var(--bg)] p-4 ">
+                <div className="flex justify-between">
+                  <h2>EDITIING {edit}</h2>
+                  <button onClick={() => editClose()}>close</button>
+                </div>
+                <p>{JSON.stringify(editingSample)}</p>
+                <Preview
+                  sample={editingSample}
+                  buffer={buffers[editingSample.bufferid]}
+                />
+              </section>
+            )}
+          </div>
+
+          <Keyboard samples={samples} />
+        </main>
+        <Modal isOpen={loading}>
+          <div className=" bg-[var(--b2)]">
+            <p className=" text-3xl">LOADING....</p>
+          </div>
+        </Modal>
+
+        <Footer />
+      </div>
+    </>
   );
 }
 
+const Keyboard = ({ samples }: { samples: SamplesT }) => {
+  const Key = ({ k }: { k: string }) => {
+    const sample = samples[k];
+    // const state = useSelector((st) => st.state);
+    const dispatch = useDispatch();
+
+    return (
+      <button
+        className={
+          " w-[7vw]  aspect-square" +
+          (sample?.active ? " bg-white text-black" : " border border-white")
+        }
+        onClick={() => dispatch(editKey(k))}
+      >
+        {k}
+      </button>
+    );
+  };
+
+  return (
+    <section>
+      <div className=" flex flex-col gap-1 ">
+        <div className=" ml-[0vw] flex gap-1 ">
+          {"qwertyuiop".split("").map((k) => (
+            <Key key={k} k={k} />
+          ))}
+        </div>
+        <div className=" ml-[2vw] flex gap-1">
+          {"asdfghjkl".split("").map((k) => (
+            <Key key={k} k={k} />
+          ))}
+        </div>
+        <div className=" ml-[5vw] flex gap-1">
+          {"zxcvbnm".split("").map((k) => (
+            <Key key={k} k={k} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const Preview = ({
-  bufferId,
   buffer,
   sample,
 }: {
-  bufferId: string;
-  // edit: string;
   buffer: AudioBuffer;
   sample: SampleT;
-  // callback: (type: string, val: any) => void;
-  // removeBuffer: (id: string) => void;
 }) => {
   const [wavebuffer, setWavebuffer] = useState<number[] | null>(null);
   useEffect(() => {
@@ -137,7 +188,11 @@ const Preview = ({
     setWavebuffer(wave);
   }, [buffer]);
 
-  return <div>asdasd</div>;
+  return (
+    <div>
+      <SampleWave sample={sample} wave={wavebuffer} buffer={buffer} />
+    </div>
+  );
 };
 
 export const findmax = (arr: Float32Array | number[]) => {
@@ -147,44 +202,6 @@ export const findmax = (arr: Float32Array | number[]) => {
     if (x > max) max = x;
   });
   return max;
-};
-
-const Keyboard = ({ samples }: { samples: SamplesT }) => {
-  return (
-    <section>
-      <div className=" flex flex-col gap-1 ">
-        <div className=" ml-[0vw] flex gap-1 ">
-          {"qwertyuiop".split("").map((k) => (
-            <Key key={k} letter={k} sample={samples[k]} />
-          ))}
-        </div>
-        <div className=" ml-[2vw] flex gap-1">
-          {"asdfghjkl".split("").map((k) => (
-            <Key key={k} letter={k} sample={samples[k]} />
-          ))}
-        </div>
-        <div className=" ml-[5vw] flex gap-1">
-          {"zxcvbnm".split("").map((k) => (
-            <Key key={k} letter={k} sample={samples[k]} />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-const Key = ({
-  letter,
-  sample,
-}: {
-  letter: string;
-  sample: SampleT | null;
-}) => {
-  return (
-    <button className=" w-[9vw] border border-white aspect-square">
-      {letter}
-    </button>
-  );
 };
 
 const Footer = () => (
