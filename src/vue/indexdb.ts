@@ -1,5 +1,3 @@
-// ================================
-
 const DB_NAME = "web-sampler";
 const STORE_NAME = "samples-cache";
 
