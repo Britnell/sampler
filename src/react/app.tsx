@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useLocalStorageState } from "./hooks";
 import { Modal } from "./Modal";
 import { Loader } from "./loader";
+import { Provider, atom, useAtom, useSetAtom } from "jotai";
+import { useAppState, useSamples } from "./state";
+import { SampleWave } from "./viz";
 
 export type BufferState = { [name: string]: AudioBuffer };
 
@@ -17,14 +20,19 @@ export type SamplesT = {
 
 const ALLKEYS = "qwertyuiopasdfghjklzxcvbnm1234567890";
 
-export default function App() {
+export default function Wrapper() {
+  return (
+    <Provider>
+      <App />
+    </Provider>
+  );
+}
+export function App() {
   const [buffers, setBuffers] = useState<BufferState>({});
   const [loading, setLoading] = useState(false);
-  const [samples, setSamples] = useLocalStorageState<SamplesT>(
-    "sample-keys",
-    {}
-  );
-  const [edit, setEdit] = useState("");
+  const [state, setState] = useAppState();
+  const [samples, setSamples] = useSamples();
+  const [modal, setModal] = useState({ type: "", value: "" });
 
   useEffect(() => {
     const keydown = (ev: KeyboardEvent) => {
@@ -33,7 +41,7 @@ export default function App() {
 
       if (ALLKEYS.includes(key)) {
         // SAMPLE KEY
-        setEdit(key);
+        // setEdit(key);
       }
 
       if (key.startsWith("Arrow")) {
@@ -55,6 +63,7 @@ export default function App() {
     };
   }, []);
 
+  const { edit } = state;
   const editingSample = samples[edit];
 
   return (
@@ -62,16 +71,27 @@ export default function App() {
       <header>
         <h1 className=" my-2 text-2xl">Audio-Sampler</h1>
       </header>
-      <main className=" h-[calc(100vh-60px)] grid grid-rows-[1fr_300px] gap-10 ">
-        {!editingSample?.active && (
+      <main className=" h-[calc(100vh-60px)] grid grid-rows-[1fr_auto] gap-10 ">
+        {!edit && (
           <section>
             <Loader setBuffers={setBuffers} setLoading={setLoading} />
             <div>
               <h2>Sources</h2>
               <ul className=" list-disc pl-5">
-                {Object.entries(buffers).map(([name, buffer]) => (
-                  <li key={name}>
-                    <span className=" ">{name}</span>
+                {Object.entries(buffers).map(([bufferId, buffer]) => (
+                  <li key={bufferId}>
+                    <span className=" ">{bufferId}</span>
+                    <button
+                      className=" bg-white text-black "
+                      onClick={() =>
+                        setModal({
+                          type: "assign",
+                          value: bufferId,
+                        })
+                      }
+                    >
+                      assign
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -82,7 +102,9 @@ export default function App() {
           <section>
             <div className="flex justify-between">
               <h2>EDITIING {edit}</h2>
-              <button onClick={() => setEdit("")}>close</button>
+              <button onClick={() => setState((st) => ({ ...st, edit: "" }))}>
+                close
+              </button>
             </div>
             <p>{JSON.stringify(editingSample)}</p>
             <Preview
@@ -92,11 +114,19 @@ export default function App() {
             />
           </section>
         )}
-        <Keyboard samples={samples} />
+        <Keyboard />
       </main>
       <Modal isOpen={loading}>
         <div className=" bg-[var(--b2)]">
           <p className=" text-3xl">LOADING....</p>
+        </div>
+      </Modal>
+
+      <Modal isOpen={modal.type === "assign"}>
+        <div className=" bg-[var(--b2)]">
+          <h2>Assign sample to key</h2>
+          <p>{modal.value}</p>
+          <p className=" ">press key to assign</p>
         </div>
       </Modal>
 
@@ -133,11 +163,14 @@ const Preview = ({
       wave.push(max);
       last = to + 1;
     }
-
     setWavebuffer(wave);
   }, [buffer]);
 
-  return <div>asdasd</div>;
+  return (
+    <div>
+      <SampleWave sample={sample} wave={wavebuffer} buffer={buffer} />
+    </div>
+  );
 };
 
 export const findmax = (arr: Float32Array | number[]) => {
@@ -149,7 +182,9 @@ export const findmax = (arr: Float32Array | number[]) => {
   return max;
 };
 
-const Keyboard = ({ samples }: { samples: SamplesT }) => {
+const Keyboard = () => {
+  const [samples, setSamples] = useSamples();
+
   return (
     <section>
       <div className=" flex flex-col gap-1 ">
@@ -180,8 +215,17 @@ const Key = ({
   letter: string;
   sample: SampleT | null;
 }) => {
+  const [state, setState] = useAppState();
+  const [samples] = useSamples();
+
   return (
-    <button className=" w-[9vw] border border-white aspect-square">
+    <button
+      className=" w-[min(7vw,10vh)] border border-white aspect-square"
+      onClick={() => {
+        if (samples[letter]?.active)
+          setState((st) => ({ ...st, edit: letter }));
+      }}
+    >
       {letter}
     </button>
   );
