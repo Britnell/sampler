@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, watchEffect } from "vue";
+import { ref, onMounted, onUnmounted, watchEffect } from "vue";
 import { samplesDbReadAll } from "./indexdb";
 import { cachedRef } from "./hooks";
 import Modal from "./modal.vue";
+import type { KeyboardEvent } from "react";
 
 declare global {
   interface Window {
@@ -31,6 +32,19 @@ const createEmpty = () => {
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const buffers = ref<BufferState>({});
 const samples = cachedRef<SamplesT>("sample-keys", createEmpty());
+//
+const ui = ref<{
+  view: SampleT | null;
+  modal: { type: string; value?: string } | null;
+  assignBuffer: string;
+}>({
+  view: null,
+  modal: null,
+  assignBuffer: "",
+});
+// const view = ref<SampleT | null>(null);
+// const modal = ref<>({});
+// const loadBufferId = ref("");
 
 onMounted(async () => {
   const blobs = await samplesDbReadAll().catch((e) => console.error(e));
@@ -52,65 +66,137 @@ onMounted(async () => {
   buffers.value = srcs;
 });
 
-const modal = ref<{ type?: string; value?: string }>({});
-const loadBufferId = ref("");
+const keydown = (ev: KeyboardEvent) => {
+  const { key } = ev;
+  //  play sample
+  if (samples.value[key]?.active) {
+    console.log(" PLAY ", samples.value[key]);
+    return;
+  }
+  console.log("down", key);
+
+  if (ui.value.view?.active) {
+    if (key === "Escape") ui.value.view = null;
+  }
+};
+
+const keyup = (ev: KeyboardEvent) => {
+  // console.log(" up ", ev);
+};
+
+onMounted(() => {
+  // @ts-ignore
+  window.addEventListener("keydown", keydown);
+  // @ts-ignore
+  window.addEventListener("keyup", keyup);
+});
+
+onUnmounted(() => {
+  // @ts-ignore
+  window.removeEventListener("keydown", keydown);
+  // @ts-ignore
+  window.removeEventListener("keyup", keyup);
+});
 
 watchEffect(() => {
   // console.log("buffers", buffers.value);
-  // console.log("keys", samples.value);
-  console.log("modal", modal.value);
+  // console.log("samples", samples.value);
+  // console.log("modal", modal.value);
 });
 
-const addSample = () => {
-  modal.value = {
+const openSampleModal = () => {
+  ui.value.modal = {
     type: "assign",
   };
-  console.log("loadid", loadBufferId.value);
 };
 
-// const keyboard = ;
+const assignKey = ({ key }: KeyboardEvent) => {
+  if (ui.value.modal?.type !== "assign") return;
+  // console.log(key, ui.value.assignBuffer);
+  samples.value[key] = {
+    key,
+    active: true,
+    begin: 0,
+    bufferid: ui.value.assignBuffer,
+  };
+  ui.value.modal = null;
+};
+
+const viewSample = (sample: SampleT | null) => {
+  if (!sample?.active) return;
+  const smp = samples.value[sample.key];
+  if (smp?.active) {
+    ui.value.view = smp;
+  }
+};
+
+const removeKey = () => {
+  if (ui.value.view) ui.value.view.active = false;
+};
 </script>
 <template>
-  <h1>Audio Sampler</h1>
-  <p>lorem</p>
-  <div>
-    load buffer onto key : {{ loadBufferId }}
-    <div>
-      <label for="samplesel"> Songs: </label>
-      <select
-        name="samplesel"
-        id="samplesel"
-        v-model="loadBufferId"
-        class="bg-black"
-      >
-        <option v-for="k in Object.keys(buffers)" :value="k">
-          {{ k }}
-        </option>
-      </select>
-      <button @click="addSample" class="border border-white px-2 py-1">
-        assign
-      </button>
-    </div>
-  </div>
-  <div>
-    <p :class="modal.type === 'assign' ? 'a' : 'b'">sadasd</p>
-    <Modal :isOpen="modal.type === 'assign'" @close="modal = {}" />
-  </div>
-  <div>
-    <div
-      class="flex gap-2"
-      v-for="row in ['qwertyuiop', 'asdfghjkl;', 'zxcvbnm,.']"
-    >
-      <div class="grow aspect-square border border-white p-2" v-for="k in row">
-        <div v-if="samples[k]">
-          {{ JSON.stringify(samples[k]) }}
+  <header>
+    <h1 class="h-10">Audio Sampler</h1>
+  </header>
+  <main class="min-h-[calc(100vh-2.5rem)] grid grid-rows-[1fr_auto]">
+    <section class="relative">
+      <div class="loader">
+        <div>
+          <div>
+            <label for="samplesel"> Songs: </label>
+            <select
+              name="samplesel"
+              id="samplesel"
+              v-model="ui.assignBuffer"
+              class="bg-black"
+            >
+              <option v-for="k in Object.keys(buffers)" :value="k">
+                {{ k }}
+              </option>
+            </select>
+            <button
+              @click="openSampleModal"
+              class="border border-white px-2 py-1"
+            >
+              assign
+            </button>
+          </div>
         </div>
-        <span>{{ k }}</span>
       </div>
-    </div>
 
-    <!-- <div v-for="([k, key], i) in Object.entries(samples)">
-      {{ i }}{{ k }} - {{ JSON.stringify(key) }}
-    </div> -->
-  </div>
+      <div class="view absolute inset-0 bg-[var(--bg)]" v-if="ui.view?.active">
+        <div class="flex justify-between">
+          <h2 class="text-2xl">{{ ui.view.key }}</h2>
+          <button @click="ui.view = null">Close</button>
+        </div>
+        <p>{{ ui.view?.bufferid }} @{{ ui.view?.begin }}</p>
+        <div>
+          <button @click="removeKey">remove</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div
+        class="flex gap-2"
+        v-for="row in ['qwertyuiop', 'asdfghjkl;', 'zxcvbnm,.']"
+      >
+        <button
+          class="grow aspect-square border border-white p-2 box-content"
+          v-for="k in row"
+          :class="samples[k]?.active ? ' bg-white bg-opacity-10 ' : ''"
+          @click="viewSample(samples[k])"
+        >
+          {{ k }}
+        </button>
+      </div>
+    </section>
+    <div>
+      <Modal
+        :isOpen="ui.modal?.type === 'assign'"
+        @close="ui.modal = null"
+        @keypress="assignKey"
+      />
+    </div>
+  </main>
 </template>
