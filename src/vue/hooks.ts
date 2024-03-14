@@ -3,7 +3,6 @@ import { ref, watchEffect, type UnwrapRef, type Ref } from "vue";
 const readLocal = <T>(key: string, initial: T): T => {
   try {
     const str = localStorage.getItem(key);
-    console.log({ str });
     if (!str) return initial;
     return JSON.parse(str);
   } catch (e) {
