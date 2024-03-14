@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted, watchEffect } from "vue";
 import { samplesDbReadAll } from "./indexdb";
 import { cachedRef } from "./hooks";
 import Modal from "./modal.vue";
-import type { KeyboardEvent } from "react";
+import Sampleviz from "./samplewave.vue";
 
 declare global {
   interface Window {
@@ -42,6 +42,7 @@ const ui = ref<{
   modal: null,
   assignBuffer: "",
 });
+
 // const view = ref<SampleT | null>(null);
 // const modal = ref<>({});
 // const loadBufferId = ref("");
@@ -85,16 +86,12 @@ const keyup = (ev: KeyboardEvent) => {
 };
 
 onMounted(() => {
-  // @ts-ignore
   window.addEventListener("keydown", keydown);
-  // @ts-ignore
   window.addEventListener("keyup", keyup);
 });
 
 onUnmounted(() => {
-  // @ts-ignore
   window.removeEventListener("keydown", keydown);
-  // @ts-ignore
   window.removeEventListener("keyup", keyup);
 });
 
@@ -139,8 +136,8 @@ const removeKey = () => {
     <h1 class="h-10">Audio Sampler</h1>
   </header>
   <main class="min-h-[calc(100vh-2.5rem)] grid grid-rows-[1fr_auto]">
-    <section class="relative">
-      <div class="loader">
+    <div class="relative">
+      <section class="loader">
         <div>
           <div>
             <label for="samplesel"> Songs: </label>
@@ -162,9 +159,12 @@ const removeKey = () => {
             </button>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="view absolute inset-0 bg-[var(--bg)]" v-if="ui.view?.active">
+      <section
+        class="view absolute inset-0 bg-[var(--bg)]"
+        v-if="ui.view?.active"
+      >
         <div class="flex justify-between">
           <h2 class="text-2xl">{{ ui.view.key }}</h2>
           <button @click="ui.view = null">Close</button>
@@ -173,8 +173,9 @@ const removeKey = () => {
         <div>
           <button @click="removeKey">remove</button>
         </div>
-      </div>
-    </section>
+        <Sampleviz :buffer="buffers[ui.view.bufferid]" :sample="ui.view" />
+      </section>
+    </div>
 
     <section>
       <div
