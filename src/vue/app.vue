@@ -2,6 +2,7 @@
 import { ref, onMounted, watchEffect } from "vue";
 import { samplesDbReadAll } from "./indexdb";
 import { cachedRef } from "./hooks";
+import Modal from "./modal.vue";
 
 declare global {
   interface Window {
@@ -19,38 +20,17 @@ export type SampleT = {
   bufferid: string;
 };
 
-const emptyKeys = {
-  a: null,
-  b: null,
-  c: null,
-  d: null,
-  e: null,
-  f: null,
-  g: null,
-  h: null,
-  i: null,
-  j: null,
-  k: null,
-  l: null,
-  m: null,
-  n: null,
-  o: null,
-  p: null,
-  q: null,
-  r: null,
-  s: null,
-  t: null,
-  u: null,
-  v: null,
-  w: null,
-  x: null,
-  y: null,
-  z: null,
+const createEmpty = () => {
+  const empty: SamplesT = {};
+  "abcdefghijklmnopqrstuvwxyz".split("").forEach((letter) => {
+    empty[letter] = null;
+  });
+  return empty;
 };
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const buffers = ref<BufferState>({});
-const samples = cachedRef<SamplesT>("sample-keys", emptyKeys);
+const samples = cachedRef<SamplesT>("sample-keys", createEmpty());
 
 onMounted(async () => {
   const blobs = await samplesDbReadAll().catch((e) => console.error(e));
@@ -72,16 +52,20 @@ onMounted(async () => {
   buffers.value = srcs;
 });
 
+const modal = ref<{ type?: string; value?: string }>({});
 const loadBufferId = ref("");
+
 watchEffect(() => {
-  console.log("buffers", buffers.value);
-  console.log("keys", samples.value);
-  console.log("loadid", loadBufferId.value);
+  // console.log("buffers", buffers.value);
+  // console.log("keys", samples.value);
+  console.log("modal", modal.value);
 });
 
 const addSample = () => {
+  modal.value = {
+    type: "assign",
+  };
   console.log("loadid", loadBufferId.value);
-  console.log(" LOAD");
 };
 
 // const keyboard = ;
@@ -93,15 +77,24 @@ const addSample = () => {
     load buffer onto key : {{ loadBufferId }}
     <div>
       <label for="samplesel"> Songs: </label>
-      <select name="samplesel" id="samplesel" x-model="loadBufferId">
-        <option v-for="k in Object.keys(buffers)">
+      <select
+        name="samplesel"
+        id="samplesel"
+        v-model="loadBufferId"
+        class="bg-black"
+      >
+        <option v-for="k in Object.keys(buffers)" :value="k">
           {{ k }}
         </option>
       </select>
       <button @click="addSample" class="border border-white px-2 py-1">
-        Load onto key
+        assign
       </button>
     </div>
+  </div>
+  <div>
+    <p :class="modal.type === 'assign' ? 'a' : 'b'">sadasd</p>
+    <Modal :isOpen="modal.type === 'assign'" @close="modal = {}" />
   </div>
   <div>
     <div
