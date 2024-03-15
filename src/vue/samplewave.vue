@@ -1,19 +1,10 @@
 <script setup lang="ts">
-import {
-  ref,
-  defineProps,
-  onMounted,
-  watchEffect,
-  toRefs,
-  computed,
-} from "vue";
+import { ref, defineProps, watchEffect, toRefs, computed } from "vue";
 
 const props = defineProps(["sample", "buffer"]);
-// const { sample, buffer } = toRefs(props);
-
+const { sample, buffer } = toRefs(props);
+// const { sample, buffer } = props;
 const canvasref = ref<HTMLCanvasElement>();
-
-const { sample, buffer } = props;
 
 const findmax = (arr: Float32Array | number[]) => {
   let max = 0;
@@ -25,8 +16,8 @@ const findmax = (arr: Float32Array | number[]) => {
 };
 
 const wavebuffer = computed(() => {
-  const audioData = buffer.getChannelData(0);
-  const chunkSize = buffer.sampleRate / 1000;
+  const audioData = buffer?.value.getChannelData(0);
+  const chunkSize = buffer?.value.sampleRate / 1000;
   const chunks = audioData.length / chunkSize;
   let last = 0;
 
@@ -42,9 +33,7 @@ const wavebuffer = computed(() => {
   return wave;
 });
 
-watchEffect(() => {});
-
-onMounted(() => {
+watchEffect(() => {
   const canvas = canvasref.value;
   if (!canvas) return;
   const parent = canvas.parentElement?.getBoundingClientRect();
@@ -56,7 +45,7 @@ onMounted(() => {
   if (!ctx) return;
 
   // draf from wavepos - x
-  const perc = sample.begin / buffer.duration;
+  const perc = sample?.value.begin / buffer?.value.duration;
   const samplepos = Math.floor(perc * wavebuffer.value.length);
   const W = canvas.width;
   const H = canvas.height;
