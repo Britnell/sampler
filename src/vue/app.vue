@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watchEffect } from "vue";
-import { samplesDbReadAll } from "./indexdb";
 import { cachedRef } from "./hooks";
 import Modal from "./modal.vue";
 import Sampleviz from "./samplewave.vue";
 import { loadSource } from "../react/loader";
-import { loadBlobBuffer } from "./audio";
 import { loadCachedSamples } from "./lib";
 
 declare global {
@@ -47,11 +45,8 @@ const ui = ref<{
   assignBuffer: "",
 });
 
-// const view = ref<SampleT | null>(null);
-// const modal = ref<>({});
-// const loadBufferId = ref("");
-
 onMounted(async () => {
+  // set loading state
   const _src = await loadCachedSamples();
   if (_src) buffers.value = _src;
 });
