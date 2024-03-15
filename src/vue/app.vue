@@ -5,6 +5,7 @@ import Modal from "./modal.vue";
 import Sampleviz from "./samplewave.vue";
 import { loadSource } from "../react/loader";
 import { loadCachedSamples } from "./lib";
+import Assign from "./assign.vue";
 
 declare global {
   interface Window {
@@ -66,7 +67,7 @@ const keydown = (ev: KeyboardEvent) => {
     return;
   }
 
-  console.log("down", key);
+  // console.log("down", key);
 
   if (ui.value.view?.active) {
     if (key === "Escape") ui.value.view = null;
@@ -144,30 +145,8 @@ const removeKey = () => {
     class="min-h-[calc(100vh-2.5rem)] grid grid-rows-[1fr_minmax(400px,auto)]"
   >
     <div class="relative">
-      <section class="loader">
-        <div>
-          <div>
-            <label for="samplesel"> Songs: </label>
-            <select
-              name="samplesel"
-              id="samplesel"
-              v-model="ui.assignBuffer"
-              class="bg-black"
-            >
-              <option v-for="k in Object.keys(buffers)" :value="k">
-                {{ k }}
-              </option>
-            </select>
-            <button
-              @click="openSampleModal"
-              class="border border-white px-2 py-1"
-            >
-              assign
-            </button>
-          </div>
-        </div>
-      </section>
-
+      <p>{{ ui.assignBuffer }}</p>
+      <Assign :ui="ui" :buffers="buffers" @assign="openSampleModal" />
       <section
         class="view absolute inset-0 bg-[var(--bg)]"
         v-if="ui.view?.active"
