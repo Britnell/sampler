@@ -4,7 +4,7 @@ import { cachedRef } from "./hooks";
 import Modal from "./modal.vue";
 import Sampleviz from "./samplewave.vue";
 import { loadSource } from "../react/loader";
-import { loadCachedSamples } from "./lib";
+import { loadCachedSamples, limit } from "./lib";
 import Assign from "./assign.vue";
 
 declare global {
@@ -22,6 +22,7 @@ export type SampleT = {
   active: boolean;
   held: boolean;
   begin: number;
+  end?: number;
 };
 
 const createEmpty = () => {
@@ -37,13 +38,13 @@ const buffers = ref<BufferState>({});
 const samples = cachedRef<SamplesT>("sample-keys", createEmpty());
 //
 const ui = ref<{
-  view: SampleT | null;
+  sample: SampleT | null;
   modal: { type: string; value?: string } | null;
   assignBuffer: string;
   edit: "begin" | "end" | null;
   loading: boolean;
 }>({
-  view: null,
+  sample: null,
   modal: null,
   assignBuffer: "",
   edit: null,
@@ -73,10 +74,25 @@ const keydown = (ev: KeyboardEvent) => {
     return;
   }
 
-  // console.log("down", key);
-
-  if (ui.value.view?.active) {
-    if (key === "Escape") ui.value.view = null;
+  if (key.startsWith("Arrow")) {
+    const sample = ui.value.sample;
+    const edit = ui.value.edit;
+    if (!edit || !sample) return;
+    const fine = ev.shiftKey ? 0.5 : 1;
+    const keyVals: { [k: string]: number } = {
+      ArrowUp: 0.01,
+      ArrowDown: -0.01,
+      ArrowLeft: -0.1,
+      ArrowRight: 0.1,
+    };
+    if (!keyVals[key]) return;
+    let next = sample.begin + keyVals[key] * fine;
+    if (next < 0) next = 0;
+    sample[edit] = next;
+  }
+  // close sample
+  if (ui.value.sample?.active) {
+    if (key === "Escape") ui.value.sample = null;
   }
 };
 
@@ -135,12 +151,12 @@ const viewSample = (sample: SampleT | null) => {
   if (!sample?.active) return;
   const smp = samples.value[sample.key];
   if (smp?.active) {
-    ui.value.view = smp;
+    ui.value.sample = smp;
   }
 };
 
 const removeKey = () => {
-  if (ui.value.view) ui.value.view.active = false;
+  if (ui.value.sample) ui.value.sample.active = false;
 };
 </script>
 <template>
@@ -155,21 +171,32 @@ const removeKey = () => {
 
       <section
         class="view absolute inset-0 bg-[var(--bg)]"
-        v-if="ui.view?.active"
+        v-if="ui.sample?.active"
       >
         <div class="flex justify-between">
-          <h2 class="text-2xl">{{ ui.view.key }}</h2>
-          <button @click="ui.view = null">Close</button>
+          <h2 class="text-2xl">{{ ui.sample.key }}</h2>
+          <button @click="ui.sample = null">Close</button>
         </div>
-        <p>{{ ui.view?.bufferid }} @{{ ui.view?.begin }}</p>
+        <p>{{ ui.sample?.bufferid }} @{{ ui.sample?.begin }}</p>
         <div>
           <button @click="removeKey">remove</button>
         </div>
-        <Sampleviz :buffer="buffers[ui.view.bufferid]" :sample="ui.view" />
+        <Sampleviz :buffer="buffers[ui.sample.bufferid]" :sample="ui.sample" />
         <div class="flex justify-between">
-          <button @click="ui.edit = 'begin'">Edit begin</button>
-          <button>Edit end</button>
+          <div>
+            <button v-if="ui.edit === 'begin'" @click="ui.edit = null">
+              finish
+            </button>
+            <button v-else @click="ui.edit = 'begin'">Edit begin</button>
+          </div>
+          <div>
+            <button v-if="ui.edit === 'end'" @click="ui.edit = null">
+              finish
+            </button>
+            <button v-else @click="ui.edit = 'end'">Edit End</button>
+          </div>
         </div>
+        <p>begin {{ ui.sample.begin }}</p>
       </section>
     </div>
 
