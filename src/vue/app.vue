@@ -138,6 +138,7 @@ const assignKey = ({ key }: KeyboardEvent) => {
     active: true,
     begin: 0,
     bufferid: ui.value.assignBuffer,
+    held: false,
   };
   ui.value.modal = null;
 };
@@ -210,7 +211,13 @@ const removeKey = () => {
         <button
           class="grow aspect-square border border-white p-2 box-content"
           v-for="k in row"
-          :class="samples[k]?.active ? ' bg-white bg-opacity-10 ' : ''"
+          :class="
+            samples[k]?.held
+              ? ' bg-blue-400 bg-opacity-50'
+              : samples[k]?.active
+              ? ' bg-white bg-opacity-10 '
+              : ''
+          "
           @click="viewSample(samples[k])"
         >
           {{ k }}
