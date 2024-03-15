@@ -5,6 +5,8 @@ import { cachedRef } from "./hooks";
 import Modal from "./modal.vue";
 import Sampleviz from "./samplewave.vue";
 import { loadSource } from "../react/loader";
+import { loadBlobBuffer } from "./audio";
+import { loadCachedSamples } from "./lib";
 
 declare global {
   interface Window {
@@ -50,26 +52,10 @@ const ui = ref<{
 // const loadBufferId = ref("");
 
 onMounted(async () => {
-  const blobs = await samplesDbReadAll().catch((e) => console.error(e));
-  if (!blobs) return;
-  const srcs: BufferState = {};
-  //   setLoading(true);
-  await Promise.all(
-    Object.entries(blobs).map(async ([name, blob]) => {
-      // load array from blob
-      const arrayBuffer = await blob.arrayBuffer();
-      const buffer = await audioContext
-        .decodeAudioData(arrayBuffer)
-        .catch((err) => console.error("err decode", err, name));
-      if (!buffer) return;
-      srcs[name] = buffer;
-      return buffer;
-    })
-  );
-  buffers.value = srcs;
+  const _src = await loadCachedSamples();
+  if (_src) buffers.value = _src;
 });
 
-const keybounce: { [id: string]: boolean } = {};
 const sources: { [id: string]: AudioBufferSourceNode | null } = {};
 
 const keydown = (ev: KeyboardEvent) => {
