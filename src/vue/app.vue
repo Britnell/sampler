@@ -17,9 +17,10 @@ export type SamplesT = {
 };
 export type SampleT = {
   key: string;
-  begin: number;
-  active: boolean;
   bufferid: string;
+  active: boolean;
+  held: boolean;
+  begin: number;
 };
 
 const createEmpty = () => {
@@ -73,16 +74,17 @@ const sources: { [id: string]: AudioBufferSourceNode | null } = {};
 
 const keydown = (ev: KeyboardEvent) => {
   const { key } = ev;
+
   //  play sample
-  if (samples.value[key]?.active) {
-    const sample = samples.value[key];
-    if (keybounce[key]) return; // key being held
-    if (!sample) return;
-    console.log(" PLAY ", sample);
+  const sample = samples.value[key];
+  if (sample) {
+    if (!sample.active) return;
+    if (sample?.held) return;
     sources[key]?.start(audioContext.currentTime, sample.begin);
-    keybounce[key] = true;
+    sample.held = true;
     return;
   }
+
   console.log("down", key);
 
   if (ui.value.view?.active) {
@@ -92,13 +94,15 @@ const keydown = (ev: KeyboardEvent) => {
 
 const keyup = (ev: KeyboardEvent) => {
   const { key } = ev;
-  // console.log(" up ", ev);
-  keybounce[key] = false;
   const sample = samples.value[key];
+  if (!sample) return;
+  sample.held = false;
   if (!sample?.active) return;
 
+  // console.log(" up ", ev);
   sources[key]?.stop();
-  const source = loadSource(buffers.value[sample.bufferid], 1.0);
+  const buffer = buffers.value[sample.bufferid];
+  const source = loadSource(buffer, 1.0);
   sources[key] = source;
 };
 
