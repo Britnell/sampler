@@ -50,15 +50,23 @@ watchEffect(() => {
   const W = canvas.width;
   const H = canvas.height;
   const chunkSize = 10;
+  const extendLeft = 20;
 
-  // begin drawing
+  // Draw
   ctx.clearRect(0, 0, W, H);
+  //  begin line
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "#dbdbdb";
+  ctx.moveTo(extendLeft, 0);
+  ctx.lineTo(extendLeft, H);
+  ctx.stroke();
+  //
   ctx.lineWidth = 2;
   ctx.strokeStyle = "#282dbd";
   ctx.beginPath();
 
   for (let x = 0; x < W; x++) {
-    const from = samplepos + x * chunkSize;
+    const from = samplepos - extendLeft + x * chunkSize;
     const slice = wavebuffer.value.slice(from, from + chunkSize);
     const max = findmax(slice);
     const y = H * (1 - max * 1.0);
