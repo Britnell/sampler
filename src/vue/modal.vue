@@ -19,6 +19,6 @@ const onClose = () => {
 
 <template>
   <dialog ref="el" @close="onClose">
-    <p>lorem ipsum</p>
+    <slot></slot>
   </dialog>
 </template>

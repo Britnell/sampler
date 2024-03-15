@@ -4,6 +4,7 @@ import { samplesDbReadAll } from "./indexdb";
 import { cachedRef } from "./hooks";
 import Modal from "./modal.vue";
 import Sampleviz from "./samplewave.vue";
+import { loadSource } from "../react/loader";
 
 declare global {
   interface Window {
@@ -67,11 +68,19 @@ onMounted(async () => {
   buffers.value = srcs;
 });
 
+const keybounce: { [id: string]: boolean } = {};
+const sources: { [id: string]: AudioBufferSourceNode | null } = {};
+
 const keydown = (ev: KeyboardEvent) => {
   const { key } = ev;
   //  play sample
   if (samples.value[key]?.active) {
-    console.log(" PLAY ", samples.value[key]);
+    const sample = samples.value[key];
+    if (keybounce[key]) return; // key being held
+    if (!sample) return;
+    console.log(" PLAY ", sample);
+    sources[key]?.start(audioContext.currentTime, sample.begin);
+    keybounce[key] = true;
     return;
   }
   console.log("down", key);
@@ -82,7 +91,15 @@ const keydown = (ev: KeyboardEvent) => {
 };
 
 const keyup = (ev: KeyboardEvent) => {
+  const { key } = ev;
   // console.log(" up ", ev);
+  keybounce[key] = false;
+  const sample = samples.value[key];
+  if (!sample?.active) return;
+
+  sources[key]?.stop();
+  const source = loadSource(buffers.value[sample.bufferid], 1.0);
+  sources[key] = source;
 };
 
 onMounted(() => {
@@ -94,6 +111,8 @@ onUnmounted(() => {
   window.removeEventListener("keydown", keydown);
   window.removeEventListener("keyup", keyup);
 });
+
+// watcheffect( ()=>) load sample sources on change
 
 watchEffect(() => {
   // console.log("buffers", buffers.value);
@@ -135,7 +154,9 @@ const removeKey = () => {
   <header>
     <h1 class="h-10">Audio Sampler</h1>
   </header>
-  <main class="min-h-[calc(100vh-2.5rem)] grid grid-rows-[1fr_auto]">
+  <main
+    class="min-h-[calc(100vh-2.5rem)] grid grid-rows-[1fr_minmax(400px,auto)]"
+  >
     <div class="relative">
       <section class="loader">
         <div>
@@ -197,7 +218,9 @@ const removeKey = () => {
         :isOpen="ui.modal?.type === 'assign'"
         @close="ui.modal = null"
         @keypress="assignKey"
-      />
+      >
+        <p>press a key to assign</p>
+      </Modal>
     </div>
   </main>
 </template>
