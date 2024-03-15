@@ -42,9 +42,7 @@ const wavebuffer = computed(() => {
   return wave;
 });
 
-watchEffect(() => {
-  console.log(buffer?.length, wavebuffer.value?.length);
-});
+watchEffect(() => {});
 
 onMounted(() => {
   const canvas = canvasref.value;

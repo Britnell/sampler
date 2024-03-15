@@ -40,16 +40,22 @@ const ui = ref<{
   view: SampleT | null;
   modal: { type: string; value?: string } | null;
   assignBuffer: string;
+  edit: "begin" | "end" | null;
+  loading: boolean;
 }>({
   view: null,
   modal: null,
   assignBuffer: "",
+  edit: null,
+  loading: false,
 });
 
 onMounted(async () => {
   // set loading state
+  ui.value.loading = true;
   const _src = await loadCachedSamples();
   if (_src) buffers.value = _src;
+  ui.value.loading = false;
 });
 
 const sources: { [id: string]: AudioBufferSourceNode | null } = {};
@@ -145,8 +151,8 @@ const removeKey = () => {
     class="min-h-[calc(100vh-2.5rem)] grid grid-rows-[1fr_minmax(400px,auto)]"
   >
     <div class="relative">
-      <p>{{ ui.assignBuffer }}</p>
       <Assign :ui="ui" :buffers="buffers" @assign="openSampleModal" />
+
       <section
         class="view absolute inset-0 bg-[var(--bg)]"
         v-if="ui.view?.active"
@@ -160,6 +166,10 @@ const removeKey = () => {
           <button @click="removeKey">remove</button>
         </div>
         <Sampleviz :buffer="buffers[ui.view.bufferid]" :sample="ui.view" />
+        <div class="flex justify-between">
+          <button @click="ui.edit = 'begin'">Edit begin</button>
+          <button>Edit end</button>
+        </div>
       </section>
     </div>
 
@@ -191,6 +201,11 @@ const removeKey = () => {
         @keypress="assignKey"
       >
         <p>press a key to assign</p>
+      </Modal>
+    </div>
+    <div>
+      <Modal :isOpen="ui.loading">
+        <p>LOADING...</p>
       </Modal>
     </div>
   </main>
