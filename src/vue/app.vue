@@ -92,7 +92,10 @@ const keydown = (ev: KeyboardEvent) => {
   }
   // close sample
   if (ui.value.sample?.active) {
-    if (key === "Escape") ui.value.sample = null;
+    if (key === "Escape") {
+      ui.value.sample = null;
+      ui.value.edit = null;
+    }
   }
 };
 
@@ -168,7 +171,6 @@ const removeKey = () => {
   >
     <div class="relative">
       <Assign :ui="ui" :buffers="buffers" @assign="openSampleModal" />
-
       <section
         class="view absolute inset-0 bg-[var(--bg)]"
         v-if="ui.sample?.active"
@@ -177,7 +179,7 @@ const removeKey = () => {
           <h2 class="text-2xl">{{ ui.sample.key }}</h2>
           <button @click="ui.sample = null">Close</button>
         </div>
-        <p>{{ ui.sample?.bufferid }} @{{ ui.sample?.begin }}</p>
+        <p>{{ ui.sample?.bufferid }}</p>
         <div>
           <button @click="removeKey">remove</button>
         </div>
@@ -196,7 +198,7 @@ const removeKey = () => {
             <button v-else @click="ui.edit = 'end'">Edit End</button>
           </div>
         </div>
-        <p>begin {{ ui.sample.begin }}</p>
+        <div>...</div>
       </section>
     </div>
 
