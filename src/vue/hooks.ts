@@ -172,6 +172,16 @@ export function useKeyboard(
     window.removeEventListener("keydown", keydown);
     window.removeEventListener("keyup", keyup);
   });
+
+  watchEffect(() => {
+    // auto load samples
+    Object.values(samples.value).forEach((sample) => {
+      if (!sample) return;
+      const buffer = buffers.value[sample.bufferid];
+      const source = loadAudioSource(buffer, 1.0);
+      sources[sample.key] = source;
+    });
+  });
 }
 
 const createEmpty = () => {
