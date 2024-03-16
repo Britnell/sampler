@@ -97,6 +97,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <p>VIZ</p>
-  <canvas ref="canvasref"></canvas>
+  <div>
+    <canvas ref="canvasref"></canvas>
+  </div>
 </template>

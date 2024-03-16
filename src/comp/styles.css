@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  button {
+  button.primary {
     @apply border border-white px-2 py-1;
   }
 }

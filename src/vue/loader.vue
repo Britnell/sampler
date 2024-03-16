@@ -76,7 +76,7 @@ const loadFromUrl = async (ev: Event) => {
               name="url"
               className=" bg-transparent border border-[var(--b2)] "
             />
-            <button className=" bg-white text-[var(--bg)]">load</button>
+            <button className="primary ">load</button>
           </form>
         </div>
         <div class="">
