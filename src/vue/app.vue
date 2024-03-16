@@ -10,9 +10,10 @@ const buffers = refBuffers();
 const samples = refSamples();
 const ui = refUi();
 
-const openSampleModal = () => {
+const openSampleModal = (val: string) => {
   ui.value.modal = {
     type: "assign",
+    value: val,
   };
 };
 const openSpliceModal = () => {

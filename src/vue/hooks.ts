@@ -64,13 +64,15 @@ export function useKeyboard(
     // if modal
     if (ui.value.modal) {
       if (ui.value.modal?.type === "assign") {
-        samples.value[key] = {
-          key,
-          active: true,
-          begin: 0,
-          bufferid: ui.value.assignBuffer,
-          held: false,
-        };
+        const id = ui.value.modal.value;
+        if (id)
+          samples.value[key] = {
+            key,
+            active: true,
+            begin: 0,
+            bufferid: id,
+            held: false,
+          };
         ui.value.modal = null;
         return;
       }
