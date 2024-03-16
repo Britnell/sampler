@@ -54,28 +54,6 @@ const openCopyModal = () => {
       :samples="samples"
       @viewSample="viewSample"
     />
-    <!-- 
-    <section class="w-4/5 wmax-w-[900px] mx-auto">
-      <div
-        class="flex gap-2"
-        v-for="row in ['qwertyuiop', 'asdfghjkl;', 'zxcvbnm,.']"
-      >
-        <button
-          class="grow aspect-square border border-white p-2 box-content"
-          v-for="k in row"
-          :class="
-            samples[k]?.held
-              ? ' bg-blue-400 bg-opacity-50'
-              : samples[k]?.active
-              ? ' bg-white bg-opacity-10 '
-              : ''
-          "
-          @click="viewSample(samples[k])"
-        >
-          {{ k }}
-        </button>
-      </div>
-    </section> -->
     <section>
       <Modal :isOpen="ui.modal?.type === 'assign'" @close="ui.modal = null">
         <p>press a key to assign</p>
