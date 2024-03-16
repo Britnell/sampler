@@ -16,7 +16,7 @@ export type SampleT = {
   active: boolean;
   held: boolean;
   begin: number;
-  end?: number;
+  end?: number | null;
 };
 export type SamplesT = {
   [id: string]: SampleT | null;
@@ -87,7 +87,8 @@ export function useKeyboard(
     if (samplekeys.includes(key)) {
       const sample = samples.value[key];
       if (!sample?.active || sample?.held) return;
-      sources[key]?.start(startNow(), sample.begin);
+      const dur = sample.end ? sample.end - sample.begin : undefined;
+      sources[key]?.start(startNow(), sample.begin, dur);
       sample.held = true;
       // open in viz - if viz is empty
       if (!ui.value.sample) {
@@ -110,8 +111,11 @@ export function useKeyboard(
         ArrowRight: 0.1,
       };
       if (!keyVals[key]) return;
-      let next = sample.begin + keyVals[key] * fine;
+      const pos = sample[edit] ?? 0;
+      let next = pos + keyVals[key] * fine;
       if (next < 0) next = 0;
+      const buffer = buffers.value[sample.bufferid];
+      if (next > buffer.duration) next = buffer.duration;
       sample[edit] = next;
     }
 

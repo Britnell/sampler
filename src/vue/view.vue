@@ -41,8 +41,19 @@ const { ui, buffers } = toRefs<Props>(props as Props);
         <button v-else @click="ui.edit = 'begin'">Edit begin</button>
       </div>
       <div>
-        <button v-if="ui.edit === 'end'" @click="ui.edit = null">finish</button>
-        <button v-else @click="ui.edit = 'end'">Edit End</button>
+        <button
+          v-if="!ui.sample.end"
+          @click="ui.sample.end = ui.sample.begin + 0.5"
+        >
+          add end
+        </button>
+        <button v-else-if="ui.edit === 'end'" @click="ui.edit = null">
+          finish
+        </button>
+        <div v-else class="flex flex-col gap-2">
+          <button @click="ui.edit = 'end'">Edit End</button>
+          <button @click="ui.sample.end = null">Remove end</button>
+        </div>
       </div>
     </div>
     <div class="flex">

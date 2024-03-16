@@ -35,24 +35,39 @@ const wavebuffer = computed(() => {
 
 let ctx: null | CanvasRenderingContext2D;
 
-const drawBegin = (width: number, height: number, start: number) => {
+const drawFromBegin = (
+  width: number,
+  height: number,
+  start: number,
+  stop: number | null
+) => {
   const extendLeft = 30;
   const chunkSize = 10;
   if (!ctx) return;
-  //  begin line
+  // style
   ctx.lineWidth = 1;
   ctx.strokeStyle = "#dbdbdb";
-  ctx.moveTo(extendLeft, 0);
-  ctx.lineTo(extendLeft, height);
+  //  begin line
+  const startLine = extendLeft;
+  ctx.moveTo(startLine, 0);
+  ctx.lineTo(startLine, height);
   ctx.stroke();
-  //
+  if (stop) {
+    const stopLine = extendLeft + (stop - start) / chunkSize;
+    // draw stop
+    ctx.moveTo(stopLine, 0);
+    ctx.lineTo(stopLine, height);
+    ctx.stroke();
+  }
+
+  // wave
   ctx.lineWidth = 2;
   ctx.strokeStyle = "#282dbd";
   ctx.beginPath();
   for (let x = 0; x < width; x++) {
     // average audio wave chunk
-    const from = start + (x - extendLeft) * chunkSize;
-    const slice = wavebuffer.value.slice(from, from + chunkSize);
+    const pos = start + (x - extendLeft) * chunkSize;
+    const slice = wavebuffer.value.slice(pos, pos + chunkSize);
     const max = findmax(slice);
     const y = height * (1 - max * 1.0);
     if (x === 0) ctx.moveTo(x, y);
@@ -64,20 +79,27 @@ const drawBegin = (width: number, height: number, start: number) => {
 watchEffect(() => {
   const canvas = canvasref.value;
   const parent = canvas?.parentElement?.getBoundingClientRect();
-  if (!canvas || !buffer || !parent) return;
+  if (!canvas || !buffer || !parent || !sample) return;
   canvas.width = parent.width;
   if (!ctx) ctx = canvas.getContext("2d");
 
   // draf from wavepos - x
-  const begin = sample?.value.begin;
-  const perc = begin / buffer.value.duration;
-  const start = Math.floor(perc * wavebuffer.value.length);
+  const start = Math.floor(
+    (sample.value.begin / buffer.value.duration) * wavebuffer.value.length
+  );
+  const stop = sample.value.end
+    ? Math.floor(
+        (sample.value.end / buffer.value.duration) * wavebuffer.value.length
+      )
+    : null;
   const edit = ui?.value.edit;
-  // console.log({ begin, start, edit });
+  console.log(sample.value.begin, sample.value.end, { edit });
 
-  drawBegin(canvas.width, canvas.height, start);
+  // if (edit === "begin") drawFromBegin(canvas.width, canvas.height, start);
 
-  // Draw
+  // if (edit === "end") drawFromBegin(canvas.width, canvas.height, start);
+
+  drawFromBegin(canvas.width, canvas.height, start, stop);
 });
 </script>
 
