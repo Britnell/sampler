@@ -24,7 +24,6 @@ const rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm,./"];
 const { ui, buffers, samples, settings } = toRefs<Props>(props as Props);
 
 useKeyboard(ui, samples, buffers, settings);
-//
 </script>
 
 <template>
@@ -33,7 +32,7 @@ useKeyboard(ui, samples, buffers, settings);
       <div v-for="row in rows" class="flex gap-2 ml-3 first:ml-0 last:ml-6">
         <button
           v-for="k in row"
-          class="flex-initial w-[min(6vw,200px)] h-[min(6vw,200px)] aspect-square border border-white p-2 box-content"
+          class="flex-initial w-[min(6vw,100px)] h-[min(6vw,100px)] aspect-square border border-white p-2 box-content"
           :class="
             samples[k]?.held
               ? ' bg-blue-400 bg-opacity-50'
