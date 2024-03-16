@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { defineProps, toRefs, onMounted } from "vue";
+import { defineProps, toRefs, onMounted, ref } from "vue";
 import { loadFileBuffer, loadUriBuffer } from "./audio";
 import { samplesDbWrite } from "./indexdb";
 import { loadCachedSamples } from "./lib";
-
+import { drums } from "./drums";
 // const emit = defineEmits([]);
 
 const props = defineProps(["buffers", "ui"]);
@@ -41,22 +41,25 @@ const fileSelect = (ev: Event) => {
   loadFile(ip.files?.[0]);
 };
 
-const loadFromUrl = async (ev: Event) => {
-  const uri = (ev.target as HTMLFormElement).url?.value;
-  if (!buffers || !ui || !uri) return;
-  ui.value.loading = true;
+const loadUri = async (uri: string) => {
+  if (!buffers || !ui) return;
 
+  ui.value.loading = true;
   const { blob, audioBuffer } = await loadUriBuffer(uri);
   if (audioBuffer) buffers.value[uri] = audioBuffer;
 
   if (blob) await samplesDbWrite(blob, uri).catch((err) => console.error(err));
   ui.value.loading = false;
 };
+const loadFromUrl = (ev: Event) => {
+  const uri = (ev.target as HTMLFormElement).url?.value;
+  if (uri) loadUri(uri);
+};
 </script>
 <template>
-  <div class="p-4">
+  <div class="">
     <div class="border border-white p-4">
-      <h2>load audio</h2>
+      <h2 class="text-xl font-bold">load audio</h2>
       <div className=" grid grid-cols-3 gap-10 ">
         <div class="">
           <label className=" mb-3 block" for="fileip">load local file :</label>
@@ -79,16 +82,18 @@ const loadFromUrl = async (ev: Event) => {
             <button className="primary ">load</button>
           </form>
         </div>
-        <div class="">
-          <p>Play rhythm roulette & get a random song for the LOC records</p>
-          <a
-            href="/api/random"
-            className="underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Random
-          </a>
+        <div class="x">
+          <p>
+            Play rhythm roulette & get a random song for the LOC records :
+            <a
+              href="/api/random"
+              className="underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Random
+            </a>
+          </p>
         </div>
       </div>
     </div>

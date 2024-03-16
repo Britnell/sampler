@@ -3683,3 +3683,295 @@ var CONFIG = {
 
 
 </body></html>`;
+
+export const sozai = `
+
+<div class="site-content">
+  <h2 class="wp-block-heading">BEST OF DRUM BREAKS 30</h2>
+
+  <figure class="wp-block-image size-large is-resized">
+    <img
+      src="https://soundsozai.com/wp-content/uploads/2020/06/best-of-drum-breaks-1024x1024.jpg"
+      fetchpriority="high"
+      decoding="async"
+      alt="BEST_OF_DRUM_BREAKS_image"
+      class="wp-image-355"
+      width="234"
+      height="234"
+      srcset="https://soundsozai.com/wp-content/uploads/2020/06/best-of-drum-breaks-1024x1024.jpg 1024w, https://soundsozai.com/wp-content/uploads/2020/06/best-of-drum-breaks-300x300.jpg 300w, https://soundsozai.com/wp-content/uploads/2020/06/best-of-drum-breaks-150x150.jpg 150w, https://soundsozai.com/wp-content/uploads/2020/06/best-of-drum-breaks-768x768.jpg 768w, https://soundsozai.com/wp-content/uploads/2020/06/best-of-drum-breaks.jpg 1250w"
+      sizes="(max-width: 234px) 100vw, 234px"
+      data-lazy-loaded="true"
+      style=""
+    /><noscript
+      ><img
+        fetchpriority="high"
+        decoding="async"
+        src="https://soundsozai.com/wp-content/uploads/2020/06/best-of-drum-breaks-1024x1024.jpg"
+        alt="BEST_OF_DRUM_BREAKS_image"
+        class="wp-image-355"
+        width="234"
+        height="234"
+        srcset="https://soundsozai.com/wp-content/uploads/2020/06/best-of-drum-breaks-1024x1024.jpg 1024w, https://soundsozai.com/wp-content/uploads/2020/06/best-of-drum-breaks-300x300.jpg 300w, https://soundsozai.com/wp-content/uploads/2020/06/best-of-drum-breaks-150x150.jpg 150w, https://soundsozai.com/wp-content/uploads/2020/06/best-of-drum-breaks-768x768.jpg 768w, https://soundsozai.com/wp-content/uploads/2020/06/best-of-drum-breaks.jpg 1250w"
+        sizes="(max-width: 234px) 100vw, 234px"
+      /></noscript
+    ><figcaption>BEST OF DRUM BREAKS 30</figcaption>
+  </figure>
+
+  <p>
+    Includes a drum break loop sound that can be used for beat making. There are
+    two types in one track. For example, you can sample the snare, hi-hat, and
+    bass drum to create the original groove. It was adopted by many beatmakers
+    in the 1990s.　Everything is your idea and new music is born.　It is not
+    unnatural to use it as it is. It becomes original by mixing new sounds.
+  </p>
+
+  <p>No.1~10　BEST OF DRUM BREAKS</p>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop01.mp3"
+    ></audio><figcaption>Drum loop 01</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop02.mp3"
+    ></audio><figcaption>Drum loop 02</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop03.mp3"
+    ></audio><figcaption>Drum loop 03</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop04.mp3"
+    ></audio><figcaption>Drum loop 04</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop05.mp3"
+    ></audio><figcaption>Drum loop 05</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop06.mp3"
+    ></audio><figcaption>Drum loop 06</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop07.mp3"
+    ></audio><figcaption>Drum loop 07</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop08.mp3"
+    ></audio><figcaption>Drum loop 08</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop09.mp3"
+    ></audio><figcaption>Drum loop 09</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop10.mp3"
+    ></audio><figcaption>Drum loop 10</figcaption>
+  </figure>
+
+  <p>No.11~20　BEST OF DRUM BREAKS</p>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop11.mp3"
+    ></audio><figcaption>Drum loop 11</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop12.mp3"
+    ></audio><figcaption>Drum loop 12</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop13.mp3"
+    ></audio><figcaption>Drum loop 13</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop14.mp3"
+    ></audio><figcaption>Drum loop 14</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop15.mp3"
+    ></audio><figcaption>Drum loop 15</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop16.mp3"
+    ></audio><figcaption>Drum loop 16</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop17.mp3"
+    ></audio><figcaption>Drum loop 17</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop18.mp3"
+    ></audio><figcaption>Drum loop 18</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop19.mp3"
+    ></audio><figcaption>Drum loop 19</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop20.mp3"
+    ></audio><figcaption>Drum loop 20</figcaption>
+  </figure>
+
+  <p>No.21~30　BEST OF DRUM BREAKS</p>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop21.mp3"
+    ></audio><figcaption>Drum loop 21</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop22.mp3"
+    ></audio><figcaption>Drum loop 22</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop23.mp3"
+    ></audio><figcaption>Drum loop 23</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop24.mp3"
+    ></audio><figcaption>Drum loop 24</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop25.mp3"
+    ></audio><figcaption>Drum loop 25</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop26.mp3"
+    ></audio><figcaption>Drum loop 26</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop27.mp3"
+    ></audio><figcaption>Drum loop 27</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop28.mp3"
+    ></audio><figcaption>Drum loop 28</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop29.mp3"
+    ></audio><figcaption>Drum loop 29</figcaption>
+  </figure>
+
+  <figure class="wp-block-audio">
+    <audio
+      controls=""
+      src="https://soundsozai.com/wp-content/uploads/2020/06/Drum_loop30.mp3"
+    ></audio><figcaption>Drum loop 30</figcaption>
+  </figure>
+
+  <p>
+    It is our pleasure to make your music production more comfortable. You can
+    combine different drum sounds to create one original sound in the world. Do
+    not hesitate. All can be downloaded for free.
+  </p>
+
+  <figure class="wp-block-image size-large">
+    <img
+      src="https://soundsozai.com/wp-content/uploads/2020/06/sound-wave-1024x136.png"
+      decoding="async"
+      width="1024"
+      height="136"
+      alt="sound-wave-image"
+      class="wp-image-181"
+      srcset="https://soundsozai.com/wp-content/uploads/2020/06/sound-wave-1024x136.png 1024w, https://soundsozai.com/wp-content/uploads/2020/06/sound-wave-300x40.png 300w, https://soundsozai.com/wp-content/uploads/2020/06/sound-wave-768x102.png 768w, https://soundsozai.com/wp-content/uploads/2020/06/sound-wave-1536x205.png 1536w, https://soundsozai.com/wp-content/uploads/2020/06/sound-wave-2048x273.png 2048w"
+      sizes="(max-width: 1024px) 100vw, 1024px"
+      data-lazy-loaded="true"
+      style=""
+    /><noscript
+      ><img
+        decoding="async"
+        width="1024"
+        height="136"
+        src="https://soundsozai.com/wp-content/uploads/2020/06/sound-wave-1024x136.png"
+        alt="sound-wave-image"
+        class="wp-image-181"
+        srcset="https://soundsozai.com/wp-content/uploads/2020/06/sound-wave-1024x136.png 1024w, https://soundsozai.com/wp-content/uploads/2020/06/sound-wave-300x40.png 300w, https://soundsozai.com/wp-content/uploads/2020/06/sound-wave-768x102.png 768w, https://soundsozai.com/wp-content/uploads/2020/06/sound-wave-1536x205.png 1536w, https://soundsozai.com/wp-content/uploads/2020/06/sound-wave-2048x273.png 2048w"
+        sizes="(max-width: 1024px) 100vw, 1024px"
+      /></noscript>
+  </figure>
+
+  <div id="comments" class="comments-area"></div><!-- #comments -->
+</div>
+`;

@@ -45,16 +45,16 @@ const openCopyModal = () => {
 };
 </script>
 <template>
-  <header>
-    <h1 class="h-10">Audio Sampler</h1>
+  <header class="max-w-[1000px] mx-auto px-8">
+    <h1 class="text-2xl font-bold py-4">Audio Sampler</h1>
   </header>
-  <main class="min-h-[calc(100vh-2.5rem)] grid grid-rows-[1fr_auto]">
-    <div class="relative">
+  <main class="min-h-[calc(100vh-4rem)] grid grid-rows-[1fr_auto]">
+    <div class="relative w-full max-w-[1000px] mx-auto px-8">
       <div class="x">
         <Loader :ui="ui" :buffers="buffers" />
         <Assign :ui="ui" :buffers="buffers" @assign="openSampleModal" />
         <div>
-          <h2>settings</h2>
+          <h2 class="text-xl font-bold">settings</h2>
           <div class="x">
             <label>switch preview window</label>
             <select

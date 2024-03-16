@@ -11,14 +11,16 @@ type Props = {
 const { buffers } = toRefs<Props>(props as Props);
 </script>
 <template>
-  <div>
-    <h2>Songs</h2>
+  <div class="p-4">
+    <h2 class="text-xl font-bold">Songs</h2>
     <div v-for="key in Object.keys(buffers)">
       <div class="flex">
         <p>
           {{ key }}
         </p>
-        <button @click="() => emit('assign', key)" class="primary">load</button>
+        <button @click="() => emit('assign', key)" class="primary ml-4">
+          assign
+        </button>
       </div>
     </div>
   </div>
