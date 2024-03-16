@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { type SampleT, refSamples, refBuffers, refUi } from "./hooks";
 import Modal from "./modal.vue";
-import Sampleviz from "./samplewave.vue";
 import Assign from "./assign.vue";
 import Loader from "./loader.vue";
 import Keyboard from "./keyboard.vue";
+import View from "./view.vue";
 
 const buffers = refBuffers();
 const samples = refSamples();
@@ -39,37 +39,13 @@ const openCopyModal = () => {
     <div class="relative">
       <Loader :ui="ui" :buffers="buffers" />
       <Assign :ui="ui" :buffers="buffers" @assign="openSampleModal" />
-      <section
-        class="view absolute inset-0 bg-[var(--bg)]"
-        v-if="ui.sample?.active"
-      >
-        <div class="flex justify-between">
-          <h2 class="text-2xl">{{ ui.sample.key }}</h2>
-          <button @click="ui.sample = null">Close</button>
-        </div>
-        <p>{{ ui.sample?.bufferid }}</p>
-        <div>
-          <button @click="removeKey">remove</button>
-        </div>
-        <Sampleviz :buffer="buffers[ui.sample.bufferid]" :sample="ui.sample" />
-        <div class="flex justify-between">
-          <div>
-            <button v-if="ui.edit === 'begin'" @click="ui.edit = null">
-              finish
-            </button>
-            <button v-else @click="ui.edit = 'begin'">Edit begin</button>
-          </div>
-          <div>
-            <button v-if="ui.edit === 'end'" @click="ui.edit = null">
-              finish
-            </button>
-            <button v-else @click="ui.edit = 'end'">Edit End</button>
-          </div>
-        </div>
-        <div class="flex">
-          <button @click="openCopyModal">copy</button>
-        </div>
-      </section>
+      <View
+        :ui="ui"
+        :buffers="buffers"
+        :samples="samples"
+        @removeKey="removeKey"
+        @openCopyModal="openCopyModal"
+      />
     </div>
 
     <Keyboard
