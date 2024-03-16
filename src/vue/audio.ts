@@ -22,7 +22,10 @@ export const loadAudioSource = (
 };
 
 export const loadUriBuffer = async (uri: string) => {
-  const blob = await fetch(uri).then((res) => res.blob());
+  const blob = await fetch(uri)
+    .then((res) => res.blob())
+    .catch((err) => null);
+  if (!blob) return {};
   const audioBuffer = await loadBlobBuffer(blob);
   return { blob, audioBuffer };
 };

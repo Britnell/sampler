@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, toRefs, onMounted } from "vue";
-import { loadFileBuffer } from "./audio";
+import { defineProps, toRefs, onMounted } from "vue";
+import { loadFileBuffer, loadUriBuffer } from "./audio";
 import { samplesDbWrite } from "./indexdb";
 import { loadCachedSamples } from "./lib";
 
@@ -10,8 +10,6 @@ const props = defineProps(["buffers", "ui"]);
 const { ui, buffers } = toRefs(props);
 
 onMounted(async () => {
-  console.log(ui, buffers);
-
   if (!ui || !buffers) return;
   // Load cache
   ui.value.loading = true;
@@ -42,6 +40,20 @@ const fileSelect = (ev: Event) => {
   const ip = ev.target as HTMLInputElement;
   loadFile(ip.files?.[0]);
 };
+
+const loadFromUrl = async (ev: Event) => {
+  const uri = (ev.target as HTMLFormElement).url?.value;
+  if (!buffers || !ui || !uri) return;
+
+  ui.value.loading = true;
+  // setLoading(true);
+  const { blob, audioBuffer } = await loadUriBuffer(uri);
+  if (audioBuffer) buffers.value[uri] = audioBuffer;
+
+  if (blob) await samplesDbWrite(blob, uri).catch((err) => console.error(err));
+  ui.value.loading = false;
+  // setLoading(false);
+};
 </script>
 <template>
   <h2>load audio</h2>
@@ -49,6 +61,17 @@ const fileSelect = (ev: Event) => {
     <label>
       <span className=" mb-3 block">load local file :</span>
       <input type="file" accept="audio/mp3" @change="fileSelect" />
+    </label>
+    <label>
+      <span className=" mb-3 block">load from url :</span>
+      <form @submit.prevent="loadFromUrl">
+        <input
+          type="text"
+          name="url"
+          className=" bg-transparent border border-[var(--b2)] "
+        />
+        <button className=" bg-white text-[var(--bg)]">load</button>
+      </form>
     </label>
   </div>
 </template>
