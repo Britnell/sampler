@@ -1,22 +1,29 @@
 <script setup lang="ts">
 import { defineProps, toRefs, defineEmits } from "vue";
-import { useKeyboard, type Ui, type BufferState, type SamplesT } from "./hooks";
+import {
+  useKeyboard,
+  type Ui,
+  type BufferState,
+  type SamplesT,
+  type Settings,
+} from "./hooks";
 
 const emit = defineEmits(["viewSample"]);
 
-const props = defineProps(["buffers", "ui", "samples"]);
+const props = defineProps(["buffers", "ui", "samples", "settings"]);
 
 type Props = {
   ui: Ui;
   buffers: BufferState;
   samples: SamplesT;
+  settings: Settings;
 };
 
 const rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm,./"];
 
-const { ui, buffers, samples } = toRefs<Props>(props as Props);
+const { ui, buffers, samples, settings } = toRefs<Props>(props as Props);
 
-useKeyboard(ui, samples, buffers);
+useKeyboard(ui, samples, buffers, settings);
 //
 </script>
 

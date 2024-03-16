@@ -53,7 +53,8 @@ export function cachedRef<T>(key: string, initial: T): Ref<UnwrapRef<T>> {
 export function useKeyboard(
   ui: Ref<Ui>,
   samples: Ref<SamplesT>,
-  buffers: Ref<BufferState>
+  buffers: Ref<BufferState>,
+  settings: Ref<Settings>
 ) {
   const sources: { [id: string]: AudioBufferSourceNode | null } = {};
   const samplekeys = "qwertyuiopasdfghjklzxcvbnm";
@@ -109,10 +110,9 @@ export function useKeyboard(
       sources[key]?.start(startNow(), sample.begin, dur);
       sample.held = true;
       // open in viz - if viz is empty
-      if (!ui.value.sample?.active) {
-        if (!sample?.active) return;
-        ui.value.sample = sample;
-      }
+      const setAll = settings.value.openView === "always";
+      const setAuto = !ui.value.sample?.active && sample.active;
+      if (setAll || setAuto) ui.value.sample = sample;
       return;
     }
 
@@ -206,4 +206,13 @@ export const refUi = () =>
     assignBuffer: "",
     edit: null,
     loading: false,
+  });
+
+export type Settings = {
+  openView: "always" | "auto";
+};
+
+export const refSettings = () =>
+  cachedRef<Settings>("settings", {
+    openView: "always",
   });
