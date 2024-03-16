@@ -13,9 +13,7 @@ declare global {
   }
 }
 export type BufferState = { [name: string]: AudioBuffer };
-export type SamplesT = {
-  [id: string]: SampleT | null;
-};
+
 export type SampleT = {
   key: string;
   bufferid: string;
@@ -23,6 +21,9 @@ export type SampleT = {
   held: boolean;
   begin: number;
   end?: number;
+};
+export type SamplesT = {
+  [id: string]: SampleT | null;
 };
 
 const createEmpty = () => {
@@ -64,6 +65,29 @@ const sources: { [id: string]: AudioBufferSourceNode | null } = {};
 const keydown = (ev: KeyboardEvent) => {
   const { key } = ev;
 
+  // first modal
+  if (ui.value.modal) {
+    if (ui.value.modal?.type === "assign") {
+      samples.value[key] = {
+        key,
+        active: true,
+        begin: 0,
+        bufferid: ui.value.assignBuffer,
+        held: false,
+      };
+      ui.value.modal = null;
+      return;
+    }
+    if (ui.value.modal?.type === "copy") {
+      if (ui.value.sample && !samples.value[key]?.active) {
+        samples.value[key] = { ...ui.value.sample, key };
+        ui.value.modal = null;
+        return;
+      }
+      return;
+    }
+  }
+
   //  play sample
   const sample = samples.value[key];
   if (sample) {
@@ -74,7 +98,8 @@ const keydown = (ev: KeyboardEvent) => {
     return;
   }
 
-  if (key.startsWith("Arrow")) {
+  // sample edit
+  if (ui.value.edit && key.startsWith("Arrow")) {
     const sample = ui.value.sample;
     const edit = ui.value.edit;
     if (!edit || !sample) return;
@@ -90,6 +115,7 @@ const keydown = (ev: KeyboardEvent) => {
     if (next < 0) next = 0;
     sample[edit] = next;
   }
+
   // close sample
   if (ui.value.sample?.active) {
     if (key === "Escape") {
@@ -137,18 +163,7 @@ const openSampleModal = () => {
   };
 };
 
-const assignKey = ({ key }: KeyboardEvent) => {
-  if (ui.value.modal?.type !== "assign") return;
-  // console.log(key, ui.value.assignBuffer);
-  samples.value[key] = {
-    key,
-    active: true,
-    begin: 0,
-    bufferid: ui.value.assignBuffer,
-    held: false,
-  };
-  ui.value.modal = null;
-};
+const assignKey = ({ key }: KeyboardEvent) => {};
 
 const viewSample = (sample: SampleT | null) => {
   if (!sample?.active) return;
@@ -161,14 +176,18 @@ const viewSample = (sample: SampleT | null) => {
 const removeKey = () => {
   if (ui.value.sample) ui.value.sample.active = false;
 };
+
+const openCopyModal = () => {
+  ui.value.modal = {
+    type: "copy",
+  };
+};
 </script>
 <template>
   <header>
     <h1 class="h-10">Audio Sampler</h1>
   </header>
-  <main
-    class="min-h-[calc(100vh-2.5rem)] grid grid-rows-[1fr_minmax(400px,auto)]"
-  >
+  <main class="min-h-[calc(100vh-2.5rem)] grid grid-rows-[1fr_auto]">
     <div class="relative">
       <Assign :ui="ui" :buffers="buffers" @assign="openSampleModal" />
       <section
@@ -198,11 +217,13 @@ const removeKey = () => {
             <button v-else @click="ui.edit = 'end'">Edit End</button>
           </div>
         </div>
-        <div>...</div>
+        <div class="flex">
+          <button @click="openCopyModal">copy</button>
+        </div>
       </section>
     </div>
 
-    <section>
+    <section class="w-4/5 wmax-w-[900px] mx-auto">
       <div
         class="flex gap-2"
         v-for="row in ['qwertyuiop', 'asdfghjkl;', 'zxcvbnm,.']"
@@ -223,19 +244,16 @@ const removeKey = () => {
         </button>
       </div>
     </section>
-    <div>
-      <Modal
-        :isOpen="ui.modal?.type === 'assign'"
-        @close="ui.modal = null"
-        @keypress="assignKey"
-      >
+    <section>
+      <Modal :isOpen="ui.modal?.type === 'assign'" @close="ui.modal = null">
         <p>press a key to assign</p>
       </Modal>
-    </div>
-    <div>
+      <Modal :isOpen="ui.modal?.type === 'copy'" @close="ui.modal = null">
+        <p>press a key to copy to</p>
+      </Modal>
       <Modal :isOpen="ui.loading">
         <p>LOADING...</p>
       </Modal>
-    </div>
+    </section>
   </main>
 </template>

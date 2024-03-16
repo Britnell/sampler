@@ -34,6 +34,7 @@ const wavebuffer = computed(() => {
 });
 
 watchEffect(() => {
+  if (!buffer) return;
   const canvas = canvasref.value;
   if (!canvas) return;
   const parent = canvas.parentElement?.getBoundingClientRect();
@@ -45,7 +46,7 @@ watchEffect(() => {
   if (!ctx) return;
 
   // draf from wavepos - x
-  const perc = sample?.value.begin / buffer?.value.duration;
+  const perc = sample?.value.begin / buffer.value.duration;
   const samplepos = Math.floor(perc * wavebuffer.value.length);
   const W = canvas.width;
   const H = canvas.height;
