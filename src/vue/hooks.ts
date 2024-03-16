@@ -7,6 +7,7 @@ import {
   type Ref,
 } from "vue";
 import { loadAudioSource, startNow } from "./audio";
+import { limit } from "./lib";
 
 export type BufferState = { [name: string]: AudioBuffer };
 
@@ -122,11 +123,16 @@ export function useKeyboard(
         ArrowRight: 0.1,
       };
       if (!keyVals[key]) return;
-      const pos = sample[edit] ?? 0;
-      let next = pos + keyVals[key] * fine;
-      if (next < 0) next = 0;
       const buffer = buffers.value[sample.bufferid];
-      if (next > buffer.duration) next = buffer.duration;
+
+      const pos = sample[edit] ?? 0;
+      let next = limit(pos + keyVals[key] * fine, 0, buffer.duration);
+
+      // handle begin / end scrolling past each other
+      if (edit === "begin" && sample?.end && next > sample.end)
+        sample.end = null;
+      if (edit === "end" && next < sample.begin) next = sample.begin;
+
       sample[edit] = next;
     }
 
