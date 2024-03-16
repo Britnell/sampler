@@ -14,6 +14,13 @@ type Props = {
 };
 
 const { ui, buffers } = toRefs<Props>(props as Props);
+
+const addEnd = () => {
+  if (!ui.value.sample) return;
+
+  ui.value.sample.end = ui.value.sample.begin + 0.5;
+  ui.value.edit = "end";
+};
 </script>
 <template>
   <section
@@ -27,7 +34,13 @@ const { ui, buffers } = toRefs<Props>(props as Props);
       <p>{{ ui.sample?.bufferid }}</p>
       <button class="primary" @click="ui.sample = null">Close</button>
     </div>
-    <div class="my-4">
+    <div class="my-4 flex justify-between">
+      <div></div>
+      <p>
+        [ {{ ui.sample.begin.toFixed(2) }}
+        <span v-if="ui.sample.end"> - {{ ui.sample.end?.toFixed(2) }} </span>
+        ]
+      </p>
       <button class="primary" @click="emit('removeKey')">remove</button>
     </div>
     <Sampleviz
@@ -49,11 +62,7 @@ const { ui, buffers } = toRefs<Props>(props as Props);
         </button>
       </div>
       <div>
-        <button
-          class="primary"
-          v-if="!ui.sample.end"
-          @click="ui.sample.end = ui.sample.begin + 0.5"
-        >
+        <button class="primary" v-if="!ui.sample.end" @click="addEnd">
           add end
         </button>
         <button
