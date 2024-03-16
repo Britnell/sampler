@@ -28,7 +28,11 @@ const { ui, buffers } = toRefs<Props>(props as Props);
     <div>
       <button @click="emit('removeKey')">remove</button>
     </div>
-    <Sampleviz :buffer="buffers[ui.sample.bufferid]" :sample="ui.sample" />
+    <Sampleviz
+      :buffer="buffers[ui.sample.bufferid]"
+      :sample="ui.sample"
+      :ui="ui"
+    />
     <div class="flex justify-between">
       <div>
         <button v-if="ui.edit === 'begin'" @click="ui.edit = null">

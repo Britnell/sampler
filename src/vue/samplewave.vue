@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, defineProps, watchEffect, toRefs, computed } from "vue";
 
-const props = defineProps(["sample", "buffer"]);
-const { sample, buffer } = toRefs(props);
+const props = defineProps(["sample", "buffer", "ui"]);
+const { sample, buffer, ui } = toRefs(props);
 // const { sample, buffer } = props;
 const canvasref = ref<HTMLCanvasElement>();
 
@@ -19,9 +19,9 @@ const wavebuffer = computed(() => {
   const audioData = buffer?.value.getChannelData(0);
   const chunkSize = buffer?.value.sampleRate / 1000;
   const chunks = audioData.length / chunkSize;
-  let last = 0;
 
   const wave = [];
+  let last = 0;
   for (let x = 1; x < chunks; x++) {
     const to = Math.floor(chunkSize * x);
     const slice = audioData.slice(last, to);
@@ -33,48 +33,51 @@ const wavebuffer = computed(() => {
   return wave;
 });
 
-watchEffect(() => {
-  if (!buffer) return;
-  const canvas = canvasref.value;
-  if (!canvas) return;
-  const parent = canvas.parentElement?.getBoundingClientRect();
-  if (!parent) return;
+let ctx: null | CanvasRenderingContext2D;
 
-  canvas.width = parent.width;
-
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-
-  // draf from wavepos - x
-  const perc = sample?.value.begin / buffer.value.duration;
-  const samplepos = Math.floor(perc * wavebuffer.value.length);
-  const W = canvas.width;
-  const H = canvas.height;
+const drawBegin = (width: number, height: number, start: number) => {
+  const extendLeft = 30;
   const chunkSize = 10;
-  const extendLeft = 20;
-
-  // Draw
-  ctx.clearRect(0, 0, W, H);
+  if (!ctx) return;
   //  begin line
   ctx.lineWidth = 1;
   ctx.strokeStyle = "#dbdbdb";
   ctx.moveTo(extendLeft, 0);
-  ctx.lineTo(extendLeft, H);
+  ctx.lineTo(extendLeft, height);
   ctx.stroke();
   //
   ctx.lineWidth = 2;
   ctx.strokeStyle = "#282dbd";
   ctx.beginPath();
-
-  for (let x = 0; x < W; x++) {
-    const from = samplepos - extendLeft + x * chunkSize;
+  for (let x = 0; x < width; x++) {
+    // average audio wave chunk
+    const from = start + (x - extendLeft) * chunkSize;
     const slice = wavebuffer.value.slice(from, from + chunkSize);
     const max = findmax(slice);
-    const y = H * (1 - max * 1.0);
+    const y = height * (1 - max * 1.0);
     if (x === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   }
   ctx.stroke();
+};
+
+watchEffect(() => {
+  const canvas = canvasref.value;
+  const parent = canvas?.parentElement?.getBoundingClientRect();
+  if (!canvas || !buffer || !parent) return;
+  canvas.width = parent.width;
+  if (!ctx) ctx = canvas.getContext("2d");
+
+  // draf from wavepos - x
+  const begin = sample?.value.begin;
+  const perc = begin / buffer.value.duration;
+  const start = Math.floor(perc * wavebuffer.value.length);
+  const edit = ui?.value.edit;
+  // console.log({ begin, start, edit });
+
+  drawBegin(canvas.width, canvas.height, start);
+
+  // Draw
 });
 </script>
 
