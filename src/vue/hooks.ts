@@ -77,7 +77,18 @@ export function useKeyboard(
         if (ui.value.sample && !samples.value[key]?.active) {
           samples.value[key] = { ...ui.value.sample, key };
           ui.value.modal = null;
-          return;
+        }
+        return;
+      }
+      if (ui.value.modal?.type === "splice") {
+        if (ui.value.sample && !samples.value[key]?.active) {
+          const copy = { ...ui.value.sample, key };
+          if (copy.end) {
+            copy.begin = copy.end;
+            copy.end = copy.begin + 0.6;
+          }
+          samples.value[key] = copy;
+          ui.value.modal = null;
         }
         return;
       }

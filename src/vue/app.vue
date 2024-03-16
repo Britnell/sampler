@@ -15,6 +15,11 @@ const openSampleModal = () => {
     type: "assign",
   };
 };
+const openSpliceModal = () => {
+  ui.value.modal = {
+    type: "splice",
+  };
+};
 
 const viewSample = (sample: SampleT | null) => {
   if (!sample?.active) return;
@@ -45,6 +50,7 @@ const openCopyModal = () => {
         :samples="samples"
         @removeKey="removeKey"
         @openCopyModal="openCopyModal"
+        @openSpliceModal="openSpliceModal"
       />
     </div>
 
@@ -60,6 +66,9 @@ const openCopyModal = () => {
       </Modal>
       <Modal :isOpen="ui.modal?.type === 'copy'" @close="ui.modal = null">
         <p>press a key to copy to</p>
+      </Modal>
+      <Modal :isOpen="ui.modal?.type === 'splice'" @close="ui.modal = null">
+        <p>press a key to splice to</p>
       </Modal>
       <Modal :isOpen="ui.loading">
         <p>LOADING...</p>
