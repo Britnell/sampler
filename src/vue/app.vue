@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import {
   cachedRef,
   useKeyboard,
@@ -10,7 +10,6 @@ import {
 } from "./hooks";
 import Modal from "./modal.vue";
 import Sampleviz from "./samplewave.vue";
-import { loadCachedSamples } from "./lib";
 import Assign from "./assign.vue";
 import Loader from "./loader.vue";
 
@@ -32,14 +31,6 @@ const ui = ref<Ui>({
   assignBuffer: "",
   edit: null,
   loading: false,
-});
-
-onMounted(async () => {
-  // set loading state
-  ui.value.loading = true;
-  const _src = await loadCachedSamples();
-  if (_src) buffers.value = _src;
-  ui.value.loading = false;
 });
 
 useKeyboard(ui, samples, buffers);
@@ -71,7 +62,7 @@ const openCopyModal = () => {
   </header>
   <main class="min-h-[calc(100vh-2.5rem)] grid grid-rows-[1fr_auto]">
     <div class="relative">
-      <Loader :ui="ui" :buffers="buffers" @assign="openSampleModal" />
+      <Loader :ui="ui" :buffers="buffers" />
       <Assign :ui="ui" :buffers="buffers" @assign="openSampleModal" />
       <section
         class="view absolute inset-0 bg-[var(--bg)]"
