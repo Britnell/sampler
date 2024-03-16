@@ -100,7 +100,9 @@ export function useKeyboard(
     }
 
     //  play sample
+
     if (samplekeys.includes(key)) {
+      if (ev.ctrlKey) return;
       const sample = samples.value[key];
       if (!sample?.active || sample?.held) return;
       const dur = sample.end ? sample.end - sample.begin : undefined;
