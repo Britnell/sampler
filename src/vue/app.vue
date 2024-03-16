@@ -1,21 +1,14 @@
 <script setup lang="ts">
-import {
-  useKeyboard,
-  type SampleT,
-  refSamples,
-  refBuffers,
-  refUi,
-} from "./hooks";
+import { type SampleT, refSamples, refBuffers, refUi } from "./hooks";
 import Modal from "./modal.vue";
 import Sampleviz from "./samplewave.vue";
 import Assign from "./assign.vue";
 import Loader from "./loader.vue";
+import Keyboard from "./keyboard.vue";
 
 const buffers = refBuffers();
 const samples = refSamples();
 const ui = refUi();
-
-useKeyboard(ui, samples, buffers);
 
 const openSampleModal = () => {
   ui.value.modal = {
@@ -79,6 +72,13 @@ const openCopyModal = () => {
       </section>
     </div>
 
+    <Keyboard
+      :ui="ui"
+      :buffers="buffers"
+      :samples="samples"
+      @viewSample="viewSample"
+    />
+    <!-- 
     <section class="w-4/5 wmax-w-[900px] mx-auto">
       <div
         class="flex gap-2"
@@ -99,7 +99,7 @@ const openCopyModal = () => {
           {{ k }}
         </button>
       </div>
-    </section>
+    </section> -->
     <section>
       <Modal :isOpen="ui.modal?.type === 'assign'" @close="ui.modal = null">
         <p>press a key to assign</p>

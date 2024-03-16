@@ -60,7 +60,7 @@ export function useKeyboard(
   const keydown = (ev: KeyboardEvent) => {
     const { key } = ev;
 
-    // first modal
+    // if modal
     if (ui.value.modal) {
       if (ui.value.modal?.type === "assign") {
         samples.value[key] = {
