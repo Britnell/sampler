@@ -1,37 +1,19 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import {
-  cachedRef,
   useKeyboard,
   type SampleT,
-  type SamplesT,
-  type BufferState,
-  type Ui,
+  refSamples,
+  refBuffers,
+  refUi,
 } from "./hooks";
 import Modal from "./modal.vue";
 import Sampleviz from "./samplewave.vue";
 import Assign from "./assign.vue";
 import Loader from "./loader.vue";
 
-const createEmpty = () => {
-  const empty: SamplesT = {};
-  "abcdefghijklmnopqrstuvwxyz".split("").forEach((letter) => {
-    empty[letter] = null;
-  });
-  return empty;
-};
-
-const buffers = ref<BufferState>({});
-const samples = cachedRef<SamplesT>("sample-keys", createEmpty());
-//
-
-const ui = ref<Ui>({
-  sample: null,
-  modal: null,
-  assignBuffer: "",
-  edit: null,
-  loading: false,
-});
+const buffers = refBuffers();
+const samples = refSamples();
+const ui = refUi();
 
 useKeyboard(ui, samples, buffers);
 

@@ -148,3 +148,25 @@ export function useKeyboard(
     window.removeEventListener("keyup", keyup);
   });
 }
+
+const createEmpty = () => {
+  const empty: SamplesT = {};
+  "abcdefghijklmnopqrstuvwxyz".split("").forEach((letter) => {
+    empty[letter] = null;
+  });
+  return empty;
+};
+
+export const refSamples = () =>
+  cachedRef<SamplesT>("sample-keys", createEmpty());
+
+export const refBuffers = () => ref<BufferState>({});
+
+export const refUi = () =>
+  ref<Ui>({
+    sample: null,
+    modal: null,
+    assignBuffer: "",
+    edit: null,
+    loading: false,
+  });
