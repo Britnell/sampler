@@ -132,11 +132,11 @@ const keyup = (ev: KeyboardEvent) => {
   const { key } = ev;
   const sample = samples.value[key];
   if (!sample) return;
+  // stop
+  sources[key]?.stop();
   sample.held = false;
   if (!sample?.active) return;
 
-  // console.log(" up ", ev);
-  sources[key]?.stop();
   const buffer = buffers.value[sample.bufferid];
   const source = loadSource(buffer, 1.0);
   sources[key] = source;
@@ -150,14 +150,6 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("keydown", keydown);
   window.removeEventListener("keyup", keyup);
-});
-
-// watcheffect( ()=>) load sample sources on change
-
-watchEffect(() => {
-  // console.log("buffers", buffers.value);
-  // console.log("samples", samples.value);
-  // console.log("modal", modal.value);
 });
 
 const openSampleModal = () => {
