@@ -80,6 +80,7 @@ export function useKeyboard(
         if (ui.value.sample && !samples.value[key]?.active) {
           samples.value[key] = { ...ui.value.sample, key };
           ui.value.modal = null;
+          ui.value.sample = samples.value[key];
         }
         return;
       }
@@ -92,6 +93,7 @@ export function useKeyboard(
           }
           samples.value[key] = copy;
           ui.value.modal = null;
+          ui.value.sample = samples.value[key];
         }
         return;
       }
