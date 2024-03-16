@@ -12,30 +12,33 @@ type Props = {
   samples: SamplesT;
 };
 
+const rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm,./"];
+
 const { ui, buffers, samples } = toRefs<Props>(props as Props);
 
 useKeyboard(ui, samples, buffers);
+//
 </script>
+
 <template>
-  <section class="w-4/5 wmax-w-[900px] mx-auto">
-    <div
-      class="flex gap-2"
-      v-for="row in ['qwertyuiop', 'asdfghjkl;', 'zxcvbnm,.']"
-    >
-      <button
-        class="grow aspect-square border border-white p-2 box-content"
-        v-for="k in row"
-        :class="
-          samples[k]?.held
-            ? ' bg-blue-400 bg-opacity-50'
-            : samples[k]?.active
-            ? ' bg-white bg-opacity-10 '
-            : ''
-        "
-        @click="emit('viewSample', samples[k])"
-      >
-        {{ k }}
-      </button>
+  <section class="flex justify-center">
+    <div class="mb-4 flex flex-col gap-2">
+      <div v-for="row in rows" class="flex gap-2 ml-3 first:ml-0 last:ml-6">
+        <button
+          v-for="k in row"
+          class="flex-initial w-[min(6vw,200px)] h-[min(6vw,200px)] aspect-square border border-white p-2 box-content"
+          :class="
+            samples[k]?.held
+              ? ' bg-blue-400 bg-opacity-50'
+              : samples[k]?.active
+              ? ' bg-white bg-opacity-10 '
+              : ''
+          "
+          @click="emit('viewSample', samples[k])"
+        >
+          {{ k }}
+        </button>
+      </div>
     </div>
   </section>
 </template>
