@@ -1,3 +1,5 @@
+import { readFile } from "./lib";
+
 declare global {
   interface Window {
     webkitAudioContext: typeof AudioContext;
@@ -11,6 +13,13 @@ export const loadUriBuffer = async (uri: string) => {
   const blob = await fetch(uri).then((res) => res.blob());
   const audioBuffer = await loadBlobBuffer(blob);
   return { blob, audioBuffer };
+};
+
+export const loadFileBuffer = async (file: File) => {
+  const arrayBuffer = await readFile(file);
+  if (!arrayBuffer) return;
+  const buffer = await loadArrayBuffer(arrayBuffer);
+  return buffer;
 };
 
 export const loadBlobBuffer = async (blob: Blob) => {

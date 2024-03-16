@@ -19,6 +19,20 @@ export async function loadCachedSamples() {
   return buffers;
 }
 
+export const readFile = async (file: File): Promise<ArrayBuffer | null> => {
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const arrayBuffer = ev.target?.result as ArrayBuffer;
+      res(arrayBuffer);
+    };
+    reader.onerror = () => {
+      rej();
+    };
+    reader.readAsArrayBuffer(file);
+  });
+};
+
 export const limit = (x: number, min: number, max: number) => {
   if (x < min) return min;
   if (x > max) return max;
