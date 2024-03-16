@@ -103,7 +103,7 @@ export function useKeyboard(
       sources[key]?.start(startNow(), sample.begin, dur);
       sample.held = true;
       // open in viz - if viz is empty
-      if (!ui.value.sample) {
+      if (!ui.value.sample?.active) {
         if (!sample?.active) return;
         ui.value.sample = sample;
       }
