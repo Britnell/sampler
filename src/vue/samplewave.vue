@@ -83,7 +83,6 @@ watchEffect(() => {
   canvas.width = parent.width;
   if (!ctx) ctx = canvas.getContext("2d");
 
-  // draf from wavepos - x
   const start = Math.floor(
     (sample.value.begin / buffer.value.duration) * wavebuffer.value.length
   );
@@ -92,13 +91,7 @@ watchEffect(() => {
         (sample.value.end / buffer.value.duration) * wavebuffer.value.length
       )
     : null;
-  const edit = ui?.value.edit;
-  console.log(sample.value.begin, sample.value.end, { edit });
-
-  // if (edit === "begin") drawFromBegin(canvas.width, canvas.height, start);
-
-  // if (edit === "end") drawFromBegin(canvas.width, canvas.height, start);
-
+  // const edit = ui?.value.edit;
   drawFromBegin(canvas.width, canvas.height, start, stop);
 });
 </script>
