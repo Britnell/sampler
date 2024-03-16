@@ -44,34 +44,53 @@ const fileSelect = (ev: Event) => {
 const loadFromUrl = async (ev: Event) => {
   const uri = (ev.target as HTMLFormElement).url?.value;
   if (!buffers || !ui || !uri) return;
-
   ui.value.loading = true;
-  // setLoading(true);
+
   const { blob, audioBuffer } = await loadUriBuffer(uri);
   if (audioBuffer) buffers.value[uri] = audioBuffer;
 
   if (blob) await samplesDbWrite(blob, uri).catch((err) => console.error(err));
   ui.value.loading = false;
-  // setLoading(false);
 };
 </script>
 <template>
-  <h2>load audio</h2>
-  <div className=" grid grid-cols-3 gap-10">
-    <label>
-      <span className=" mb-3 block">load local file :</span>
-      <input type="file" accept="audio/mp3" @change="fileSelect" />
-    </label>
-    <label>
-      <span className=" mb-3 block">load from url :</span>
-      <form @submit.prevent="loadFromUrl">
-        <input
-          type="text"
-          name="url"
-          className=" bg-transparent border border-[var(--b2)] "
-        />
-        <button className=" bg-white text-[var(--bg)]">load</button>
-      </form>
-    </label>
+  <div class="p-4">
+    <div class="border border-white p-4">
+      <h2>load audio</h2>
+      <div className=" grid grid-cols-3 gap-10 ">
+        <div class="">
+          <label className=" mb-3 block" for="fileip">load local file :</label>
+          <input
+            id="fileip"
+            type="file"
+            accept="audio/mp3"
+            @change="fileSelect"
+          />
+        </div>
+        <div class="">
+          <label for="urlip" className=" mb-3 block">load from url :</label>
+          <form @submit.prevent="loadFromUrl">
+            <input
+              id="urlip"
+              type="text"
+              name="url"
+              className=" bg-transparent border border-[var(--b2)] "
+            />
+            <button className=" bg-white text-[var(--bg)]">load</button>
+          </form>
+        </div>
+        <div class="">
+          <p>Play rhythm roulette & get a random song for the LOC records</p>
+          <a
+            href="/api/random"
+            className="underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Random
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
