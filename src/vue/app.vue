@@ -1,31 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
-import { cachedRef } from "./hooks";
+import { ref, onMounted } from "vue";
+import {
+  cachedRef,
+  useKeyboard,
+  type SampleT,
+  type SamplesT,
+  type BufferState,
+  type Ui,
+} from "./hooks";
 import Modal from "./modal.vue";
 import Sampleviz from "./samplewave.vue";
-import { loadSource } from "../react/loader";
 import { loadCachedSamples } from "./lib";
 import Assign from "./assign.vue";
 import Loader from "./loader.vue";
-
-declare global {
-  interface Window {
-    webkitAudioContext: typeof AudioContext;
-  }
-}
-export type BufferState = { [name: string]: AudioBuffer };
-
-export type SampleT = {
-  key: string;
-  bufferid: string;
-  active: boolean;
-  held: boolean;
-  begin: number;
-  end?: number;
-};
-export type SamplesT = {
-  [id: string]: SampleT | null;
-};
 
 const createEmpty = () => {
   const empty: SamplesT = {};
@@ -35,17 +22,11 @@ const createEmpty = () => {
   return empty;
 };
 
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const buffers = ref<BufferState>({});
 const samples = cachedRef<SamplesT>("sample-keys", createEmpty());
 //
-const ui = ref<{
-  sample: SampleT | null;
-  modal: { type: string; value?: string } | null;
-  assignBuffer: string;
-  edit: "begin" | "end" | null;
-  loading: boolean;
-}>({
+
+const ui = ref<Ui>({
   sample: null,
   modal: null,
   assignBuffer: "",
@@ -61,97 +42,7 @@ onMounted(async () => {
   ui.value.loading = false;
 });
 
-const sources: { [id: string]: AudioBufferSourceNode | null } = {};
-
-const samplekeys = "qwertyuiopasdfghjklzxcvbnm";
-
-const keydown = (ev: KeyboardEvent) => {
-  const { key } = ev;
-
-  // first modal
-  if (ui.value.modal) {
-    if (ui.value.modal?.type === "assign") {
-      samples.value[key] = {
-        key,
-        active: true,
-        begin: 0,
-        bufferid: ui.value.assignBuffer,
-        held: false,
-      };
-      ui.value.modal = null;
-      return;
-    }
-    if (ui.value.modal?.type === "copy") {
-      if (ui.value.sample && !samples.value[key]?.active) {
-        samples.value[key] = { ...ui.value.sample, key };
-        ui.value.modal = null;
-        return;
-      }
-      return;
-    }
-  }
-
-  //  play sample
-  if (samplekeys.includes(key)) {
-    const sample = samples.value[key];
-    if (!sample?.active || sample?.held) return;
-    sources[key]?.start(audioContext.currentTime, sample.begin);
-    sample.held = true;
-    // open in viz - if viz is empty
-    if (!ui.value.sample) viewSample(samples.value[key]);
-    return;
-  }
-
-  // sample edit
-  if (ui.value.edit && key.startsWith("Arrow")) {
-    const sample = ui.value.sample;
-    const edit = ui.value.edit;
-    if (!edit || !sample) return;
-    const fine = ev.shiftKey ? 0.5 : 1;
-    const keyVals: { [k: string]: number } = {
-      ArrowUp: 0.01,
-      ArrowDown: -0.01,
-      ArrowLeft: -0.1,
-      ArrowRight: 0.1,
-    };
-    if (!keyVals[key]) return;
-    let next = sample.begin + keyVals[key] * fine;
-    if (next < 0) next = 0;
-    sample[edit] = next;
-  }
-
-  // close sample
-  if (ui.value.sample?.active) {
-    if (key === "Escape") {
-      ui.value.sample = null;
-      ui.value.edit = null;
-    }
-  }
-};
-
-const keyup = (ev: KeyboardEvent) => {
-  const { key } = ev;
-  const sample = samples.value[key];
-  if (!sample) return;
-  // stop
-  sources[key]?.stop();
-  sample.held = false;
-  if (!sample?.active) return;
-
-  const buffer = buffers.value[sample.bufferid];
-  const source = loadSource(buffer, 1.0);
-  sources[key] = source;
-};
-
-onMounted(() => {
-  window.addEventListener("keydown", keydown);
-  window.addEventListener("keyup", keyup);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("keydown", keydown);
-  window.removeEventListener("keyup", keyup);
-});
+useKeyboard(ui, samples, buffers);
 
 const openSampleModal = () => {
   ui.value.modal = {
