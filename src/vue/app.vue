@@ -62,6 +62,8 @@ onMounted(async () => {
 
 const sources: { [id: string]: AudioBufferSourceNode | null } = {};
 
+const samplekeys = "qwertyuiopasdfghjklzxcvbnm";
+
 const keydown = (ev: KeyboardEvent) => {
   const { key } = ev;
 
@@ -89,12 +91,13 @@ const keydown = (ev: KeyboardEvent) => {
   }
 
   //  play sample
-  const sample = samples.value[key];
-  if (sample) {
-    if (!sample.active) return;
-    if (sample?.held) return;
+  if (samplekeys.includes(key)) {
+    const sample = samples.value[key];
+    if (!sample?.active || sample?.held) return;
     sources[key]?.start(audioContext.currentTime, sample.begin);
     sample.held = true;
+    // open in viz - if viz is empty
+    if (!ui.value.sample) viewSample(samples.value[key]);
     return;
   }
 
@@ -163,14 +166,9 @@ const openSampleModal = () => {
   };
 };
 
-const assignKey = ({ key }: KeyboardEvent) => {};
-
 const viewSample = (sample: SampleT | null) => {
   if (!sample?.active) return;
-  const smp = samples.value[sample.key];
-  if (smp?.active) {
-    ui.value.sample = smp;
-  }
+  ui.value.sample = sample;
 };
 
 const removeKey = () => {
