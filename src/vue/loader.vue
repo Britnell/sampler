@@ -3,7 +3,6 @@ import { defineProps, toRefs, onMounted, ref } from "vue";
 import { loadFileBuffer, loadUriBuffer } from "./audio";
 import { samplesDbWrite } from "./indexdb";
 import { loadCachedSamples } from "./lib";
-import { drums } from "./drums";
 // const emit = defineEmits([]);
 
 const props = defineProps(["buffers", "ui"]);
