@@ -19,7 +19,7 @@ type Props = {
   settings: Settings;
 };
 
-const rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm,./"];
+const rows = ["1234567890", "qwertyuiop", "asdfghjkl", "zxcvbnm"];
 
 const { ui, buffers, samples, settings } = toRefs<Props>(props as Props);
 
@@ -28,8 +28,12 @@ useKeyboard(ui, samples, buffers, settings);
 
 <template>
   <section class="flex justify-center">
-    <div class="mb-4 flex flex-col gap-2">
-      <div v-for="row in rows" class="flex gap-2 ml-3 first:ml-0 last:ml-6">
+    <div class="mb-4 flex flex-col gap-1">
+      <div
+        v-for="(row, i) in rows"
+        class="flex gap-1 ml-3 translate-x-[calc(var(--x)*1rem)]"
+        :style="'--x:' + i"
+      >
         <button
           v-for="k in row"
           class="flex-initial w-[min(6vw,80px)] h-[min(6vw,80px)] aspect-square border border-white p-2 box-content"
