@@ -81,19 +81,6 @@ const loadFromUrl = (ev: Event) => {
             <button className="primary ">load</button>
           </form>
         </div>
-        <div class="x">
-          <p>
-            Play rhythm roulette & get a random song for the LOC records :
-            <a
-              href="/api/random"
-              className="underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Random
-            </a>
-          </p>
-        </div>
       </div>
     </div>
   </div>

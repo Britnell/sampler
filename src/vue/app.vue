@@ -53,7 +53,7 @@ const openCopyModal = () => {
       <div class="x">
         <Loader :ui="ui" :buffers="buffers" />
         <Assign :ui="ui" :buffers="buffers" @assign="openSampleModal" />
-        <div>
+        <section>
           <h2 class="text-xl font-bold">settings</h2>
           <div class="x">
             <label>switch preview window</label>
@@ -70,7 +70,39 @@ const openCopyModal = () => {
               </option>
             </select>
           </div>
-        </div>
+        </section>
+        <details class="my-4">
+          <summary>
+            <h2 class="inline text-xl font-bold">find music</h2>
+          </summary>
+          <div class="grid grid-cols-2 gap-10">
+            <div class="x">
+              <p>
+                Play rhythm roulette & get a random song from the LOC records :
+                <a
+                  href="/api/random"
+                  className="underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Random
+                </a>
+              </p>
+            </div>
+            <div class="x">
+              <p>
+                here are some
+                <a
+                  href="https://rhythm-lab.com/breakbeats/"
+                  class="underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >drumbreaks</a
+                >&nbsp; to get you started
+              </p>
+            </div>
+          </div>
+        </details>
       </div>
       <View
         :ui="ui"
