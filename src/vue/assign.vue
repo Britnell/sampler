@@ -13,15 +13,15 @@ const { buffers } = toRefs<Props>(props as Props);
 <template>
   <div class="p-4">
     <h2 class="text-xl font-bold">Songs</h2>
-    <div v-for="key in Object.keys(buffers)">
-      <div class="flex">
-        <p>
+    <ul class="list-disc ml-6 space-y-2">
+      <li v-for="key in Object.keys(buffers)" class="flex items-center">
+        <span>
           {{ key }}
-        </p>
-        <button @click="() => emit('assign', key)" class="primary ml-4">
+        </span>
+        <button @click="() => emit('assign', key)" class="primary ml-4 py-0">
           assign
         </button>
-      </div>
-    </div>
+      </li>
+    </ul>
   </div>
 </template>
