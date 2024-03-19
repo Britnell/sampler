@@ -61,6 +61,7 @@ const start = () => {
     begin: Date.now(),
     recording: false,
   };
+  startSequencer();
 };
 
 const beatTime = (t: number) => {
@@ -73,43 +74,41 @@ const beatTime = (t: number) => {
   return rel;
 };
 
-// const quantize = (t: number) => {
-//   const rel = beatTime(t);
-//   const round = Math.round(rel / state.value.quantize) * state.value.quantize;
-//   return round;
-// };
-
-watchEffect(() => {
-  if (intvl) clearInterval(intvl);
-  if (!state.value.active) return;
-
+const startSequencer = () => {
   const tbar = (60 / state.value.bpm) * 1000;
   let c = 0;
 
-  intvl = setInterval(() => {
+  const timeBarSeqs = () => {
+    sequence.value.forEach((seq) => {
+      const t = setTimeout(() => {
+        const sample = samples.value[seq.key];
+        if (!sample) return;
+        if (seq.dir === "down") {
+          // console.log(" PLAY ", seq);
+          playSample(sample);
+        } else {
+          // console.log(" stop", seq);
+          stopSample(sample);
+          const buffer = buffers.value[sample.bufferid];
+          loadSample(sample, buffer);
+        }
+      }, tbar * seq.b);
+      cancelTones.set(seq, t);
+    });
+  };
+
+  const sequencer = () => {
     beep(20, c === 0 ? 1200 : 1000);
-    if (c === 0) {
-      sequence.value.forEach((seq) => {
-        const t = setTimeout(() => {
-          const sample = samples.value[seq.key];
-          if (!sample) return;
-          if (seq.dir === "down") {
-            // console.log(" PLAY ", seq);
-            playSample(sample);
-          } else {
-            // console.log(" stop", seq);
-            stopSample(sample);
-            const buffer = buffers.value[sample.bufferid];
-            loadSample(sample, buffer);
-          }
-        }, tbar * seq.b);
-        cancelTones.set(seq, t);
-      });
-    }
+
+    if (c === 0) timeBarSeqs();
+
     count.value = c + 1;
     c = (c + 1) % state.value.bars;
-  }, tbar);
-});
+  };
+
+  sequencer();
+  intvl = setInterval(sequencer, tbar);
+};
 
 const debounce: Record<string, boolean> = {};
 
