@@ -5,6 +5,7 @@ import {
   refBuffers,
   refUi,
   refSettings,
+  refTab,
 } from "./hooks";
 import Modal from "./modal.vue";
 import Assign from "./assign.vue";
@@ -12,12 +13,14 @@ import Loader from "./loader.vue";
 import Keyboard from "./keyboard.vue";
 import View from "./view.vue";
 import Finder from "./find.vue";
+import Sequencer from "./sequencer.vue";
 import { onMounted, onUnmounted } from "vue";
 
 const buffers = refBuffers();
 const samples = refSamples();
 const ui = refUi();
 const settings = refSettings();
+const tab = refTab("sequencer");
 
 const openSampleModal = (val: string) => {
   ui.value.modal = {
@@ -87,6 +90,7 @@ const keydown = (ev: KeyboardEvent) => {
     return;
   }
 };
+
 onMounted(() => {
   window.addEventListener("keydown", keydown);
   // window.addEventListener("keyup", keyup);
@@ -99,41 +103,58 @@ onUnmounted(() => {
 </script>
 <template>
   <header class="max-w-[1000px] mx-auto px-8">
-    <h1 class="text-2xl font-bold py-4">Audio Sampler</h1>
+    <div class=" ">
+      <h1 class="text-2xl font-bold py-4">Audio Sampler</h1>
+    </div>
+    <div class="flex gap-4 mb-8 border-b border-white">
+      <button
+        v-for="t in (['main', 'sequencer'] as const)"
+        class="border border-white px-2 py-1"
+        :class="t === tab ? ' bg-white text-black ' : ''"
+        @click="tab = t"
+      >
+        {{ t }}
+      </button>
+    </div>
   </header>
   <main class="min-h-[calc(100vh-4rem)] grid grid-rows-[1fr_auto]">
-    <div class="relative w-full max-w-[1000px] mx-auto px-8">
-      <div class="x">
-        <Loader :ui="ui" :buffers="buffers" />
-        <Assign :ui="ui" :buffers="buffers" @assign="openSampleModal" />
-        <section>
-          <h2 class="text-xl font-bold">settings</h2>
-          <div class="x">
-            <label>switch preview window</label>
-            <select
-              class="bg-transparent ip primary"
-              x-model="settings.openView"
-            >
-              <option
-                v-for="opt in ['always', 'auto']"
-                :value="opt"
-                class="text-black"
+    <div class="top w-full max-w-[1000px] mx-auto px-8">
+      <div v-if="tab === 'main'" class="view relative">
+        <div class="x">
+          <Loader :ui="ui" :buffers="buffers" />
+          <Assign :ui="ui" :buffers="buffers" @assign="openSampleModal" />
+          <section>
+            <h2 class="text-xl font-bold">settings</h2>
+            <div class="x">
+              <label>switch preview window</label>
+              <select
+                class="bg-transparent ip primary"
+                x-model="settings.openView"
               >
-                {{ opt }}
-              </option>
-            </select>
-          </div>
-        </section>
-        <Finder />
+                <option
+                  v-for="opt in ['always', 'auto']"
+                  :value="opt"
+                  class="text-black"
+                >
+                  {{ opt }}
+                </option>
+              </select>
+            </div>
+          </section>
+          <Finder />
+        </div>
+        <View
+          :ui="ui"
+          :buffers="buffers"
+          :samples="samples"
+          @removeKey="removeKey"
+          @openCopyModal="openCopyModal"
+          @openSpliceModal="openSpliceModal"
+        />
       </div>
-      <View
-        :ui="ui"
-        :buffers="buffers"
-        :samples="samples"
-        @removeKey="removeKey"
-        @openCopyModal="openCopyModal"
-        @openSpliceModal="openSpliceModal"
-      />
+      <div v-if="tab === 'sequencer'" class="seq">
+        <Sequencer :ui="ui" :buffers="buffers" :samples="samples" />
+      </div>
     </div>
 
     <Keyboard
