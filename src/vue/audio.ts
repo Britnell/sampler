@@ -1,3 +1,4 @@
+import type { SampleT } from "./hooks";
 import { readFile } from "./lib";
 
 declare global {
@@ -63,3 +64,26 @@ export const loadBufferSource = (
 };
 
 export const startNow = () => audioContext.currentTime;
+
+export const beep = (dur: number, f?: number) => {
+  const beeper = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  beeper.type = "square";
+  beeper.frequency.value = f ?? 440;
+  gainNode.gain.value = 0.1;
+  beeper.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  //
+  beeper.start();
+  setTimeout(() => beeper.stop(), dur);
+};
+
+type Source = { [id: string]: AudioBufferSourceNode | null };
+
+const sources: Source = {};
+
+export const playSample = (sample: SampleT) => {
+  console.log(sample);
+  const dur = sample.end ? sample.end - sample.begin : undefined;
+  sources[sample.key]?.start(audioContext.currentTime, sample.begin, dur);
+};
