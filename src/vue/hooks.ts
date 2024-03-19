@@ -6,7 +6,7 @@ import {
   type UnwrapRef,
   type Ref,
 } from "vue";
-import { loadAudioSource, startNow } from "./audio";
+import { loadSample, playSample, stopSample } from "./audio";
 import { limit } from "./lib";
 
 export type BufferState = { [name: string]: AudioBuffer };
@@ -70,8 +70,9 @@ export function useKeyboard(
       if (ev.ctrlKey) return;
       const sample = samples.value[key];
       if (!sample?.active || sample?.held) return;
-      const dur = sample.end ? sample.end - sample.begin : undefined;
-      sources[key]?.start(startNow(), sample.begin, dur);
+      playSample(sample);
+      // sources[key]?.start(startNow(), sample.begin, dur);
+
       sample.held = true;
       // open in viz - if viz is empty
       const setAll = settings.value.openView === "always";
@@ -117,15 +118,13 @@ export function useKeyboard(
 
   const keyup = (ev: KeyboardEvent) => {
     const { key } = ev;
-    sources[key]?.stop();
     // clear & reload
     const sample = samples.value[key];
     if (!sample) return;
-    sample.held = false;
-    if (!sample?.active) return;
+    stopSample(sample);
     const buffer = buffers.value[sample.bufferid];
-    const source = loadAudioSource(buffer, 1.0);
-    sources[key] = source;
+    loadSample(sample, buffer);
+    sample.held = false;
   };
 
   onMounted(() => {
@@ -143,8 +142,7 @@ export function useKeyboard(
     Object.values(samples.value).forEach((sample) => {
       if (!sample) return;
       const buffer = buffers.value[sample.bufferid];
-      const source = loadAudioSource(buffer, 1.0);
-      sources[sample.key] = source;
+      loadSample(sample, buffer);
     });
   });
 }
@@ -179,3 +177,6 @@ export const refSettings = () =>
   cachedRef<Settings>("settings", {
     openView: "always",
   });
+
+type Tabs = "main" | "view" | "sequencer" | null;
+export const refTab = (initial: Tabs) => ref<Tabs>(initial);

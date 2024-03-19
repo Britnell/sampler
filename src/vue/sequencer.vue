@@ -7,10 +7,12 @@ import {
   watchEffect,
   onMounted,
   onUnmounted,
+  computed,
 } from "vue";
 import { type Ui, type BufferState, type SamplesT } from "./hooks";
 import { beep } from "./audio";
 import { cachedRef } from "./hooks";
+import { loadSample, playSample, stopSample } from "./audio";
 
 const emit = defineEmits([""]);
 
@@ -40,14 +42,17 @@ const state = ref<State>({
 });
 
 const { ui, buffers, samples } = toRefs<Props>(props as Props);
-let intvl: number | null;
 
+let intvl: number | null;
 type Seq = {
   b: number;
   key: string;
   dir: "up" | "down";
 };
+
 const sequence = cachedRef<Seq[]>("sequence", []);
+const count = ref(0);
+const cancelTones = new Map<Seq, number>();
 
 const start = () => {
   state.value = {
@@ -68,14 +73,11 @@ const beatTime = (t: number) => {
   return rel;
 };
 
-const quantize = (t: number) => {
-  const rel = beatTime(t);
-  const round = Math.round(rel / state.value.quantize) * state.value.quantize;
-  return round;
-};
-const count = ref(0);
-
-const cancelTones = new Map<Seq, number>();
+// const quantize = (t: number) => {
+//   const rel = beatTime(t);
+//   const round = Math.round(rel / state.value.quantize) * state.value.quantize;
+//   return round;
+// };
 
 watchEffect(() => {
   if (intvl) clearInterval(intvl);
@@ -88,9 +90,18 @@ watchEffect(() => {
     beep(20, c === 0 ? 1200 : 1000);
     if (c === 0) {
       sequence.value.forEach((seq) => {
-        console.log(seq);
         const t = setTimeout(() => {
-          console.log(" PLAY ", seq);
+          const sample = samples.value[seq.key];
+          if (!sample) return;
+          if (seq.dir === "down") {
+            // console.log(" PLAY ", seq);
+            playSample(sample);
+          } else {
+            // console.log(" stop", seq);
+            stopSample(sample);
+            const buffer = buffers.value[sample.bufferid];
+            loadSample(sample, buffer);
+          }
         }, tbar * seq.b);
         cancelTones.set(seq, t);
       });
@@ -100,14 +111,18 @@ watchEffect(() => {
   }, tbar);
 });
 
+const debounce: Record<string, boolean> = {};
+
 const keydown = (ev: KeyboardEvent) => {
   const t = Date.now();
   const { key } = ev;
   if (!state.value.active) return;
 
   const sample = samples.value[key];
+
   if (!sample || !sample.active) return;
-  if (sample.held) return;
+  if (debounce[key]) return;
+  debounce[key] = true;
 
   const b = beatTime(t);
   sequence.value.push({
@@ -122,6 +137,7 @@ const keyup = (ev: KeyboardEvent) => {
   if (!state.value.active) return;
 
   const { key } = ev;
+  debounce[key] = false;
   const sample = samples.value[key];
   if (!sample || !sample.active) return;
 
@@ -153,6 +169,16 @@ const stop = () => {
   state.value.active = false;
   cancel();
 };
+
+const sequenceKeys = computed(() => {
+  const keys = new Set<string>();
+  sequence.value.forEach((seq) => keys.add(seq.key));
+  return [...keys];
+});
+
+const clearKey = (key: string) => {
+  sequence.value = sequence.value.filter((seq) => seq.key !== key);
+};
 </script>
 <template>
   <section>
@@ -160,7 +186,20 @@ const stop = () => {
     <div>
       <p>count : {{ count }}</p>
     </div>
-    <button v-if="!state.active" class="primary" @click="start">start</button>
-    <button v-else class="primary" @click="stop">stop</button>
+    <div>
+      <button v-if="!state.active" class="primary" @click="start">start</button>
+      <button v-else class="primary" @click="stop">stop</button>
+    </div>
+    <div>
+      <h2>Clear keys from sequence</h2>
+      <ul class="list-disc ml-6">
+        <li v-for="key in sequenceKeys">
+          <span>
+            {{ key }}
+          </span>
+          <button class="primary" @click="() => clearKey(key)">clear</button>
+        </li>
+      </ul>
+    </div>
   </section>
 </template>

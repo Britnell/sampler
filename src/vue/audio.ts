@@ -83,7 +83,19 @@ type Source = { [id: string]: AudioBufferSourceNode | null };
 const sources: Source = {};
 
 export const playSample = (sample: SampleT) => {
-  console.log(sample);
   const dur = sample.end ? sample.end - sample.begin : undefined;
   sources[sample.key]?.start(audioContext.currentTime, sample.begin, dur);
+};
+
+export const stopSample = (sample: SampleT) => {
+  try {
+    sources[sample.key]?.stop();
+  } catch (e) {
+    //
+  }
+};
+
+export const loadSample = (sample: SampleT, buffer: AudioBuffer) => {
+  if (!sample?.active) return;
+  sources[sample.key] = loadAudioSource(buffer, 1.0);
 };

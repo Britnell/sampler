@@ -20,7 +20,7 @@ const buffers = refBuffers();
 const samples = refSamples();
 const ui = refUi();
 const settings = refSettings();
-const tab = refTab("sequencer");
+const tab = refTab("main");
 
 const openSampleModal = (val: string) => {
   ui.value.modal = {
