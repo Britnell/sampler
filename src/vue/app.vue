@@ -12,6 +12,7 @@ import Loader from "./loader.vue";
 import Keyboard from "./keyboard.vue";
 import View from "./view.vue";
 import Finder from "./find.vue";
+import { onMounted, onUnmounted } from "vue";
 
 const buffers = refBuffers();
 const samples = refSamples();
@@ -44,6 +45,57 @@ const openCopyModal = () => {
     type: "copy",
   };
 };
+
+const keydown = (ev: KeyboardEvent) => {
+  const { key } = ev;
+
+  // if modal
+  if (!ui.value.modal) return;
+
+  if (ui.value.modal?.type === "assign") {
+    const id = ui.value.modal.value;
+    if (id)
+      samples.value[key] = {
+        key,
+        active: true,
+        begin: 0,
+        bufferid: id,
+        held: false,
+      };
+    ui.value.modal = null;
+    return;
+  }
+  if (ui.value.modal?.type === "copy") {
+    if (ui.value.sample && !samples.value[key]?.active) {
+      samples.value[key] = { ...ui.value.sample, key };
+      ui.value.modal = null;
+      ui.value.sample = samples.value[key];
+    }
+    return;
+  }
+  if (ui.value.modal?.type === "splice") {
+    if (ui.value.sample && !samples.value[key]?.active) {
+      const copy = { ...ui.value.sample, key };
+      if (copy.end) {
+        copy.begin = copy.end;
+        copy.end = copy.begin + 0.6;
+      }
+      samples.value[key] = copy;
+      ui.value.modal = null;
+      ui.value.sample = samples.value[key];
+    }
+    return;
+  }
+};
+onMounted(() => {
+  window.addEventListener("keydown", keydown);
+  // window.addEventListener("keyup", keyup);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", keydown);
+  // window.removeEventListener("keyup", keyup);
+});
 </script>
 <template>
   <header class="max-w-[1000px] mx-auto px-8">

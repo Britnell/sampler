@@ -62,46 +62,10 @@ export function useKeyboard(
   const keydown = (ev: KeyboardEvent) => {
     const { key } = ev;
 
-    // if modal
-    if (ui.value.modal) {
-      if (ui.value.modal?.type === "assign") {
-        const id = ui.value.modal.value;
-        if (id)
-          samples.value[key] = {
-            key,
-            active: true,
-            begin: 0,
-            bufferid: id,
-            held: false,
-          };
-        ui.value.modal = null;
-        return;
-      }
-      if (ui.value.modal?.type === "copy") {
-        if (ui.value.sample && !samples.value[key]?.active) {
-          samples.value[key] = { ...ui.value.sample, key };
-          ui.value.modal = null;
-          ui.value.sample = samples.value[key];
-        }
-        return;
-      }
-      if (ui.value.modal?.type === "splice") {
-        if (ui.value.sample && !samples.value[key]?.active) {
-          const copy = { ...ui.value.sample, key };
-          if (copy.end) {
-            copy.begin = copy.end;
-            copy.end = copy.begin + 0.6;
-          }
-          samples.value[key] = copy;
-          ui.value.modal = null;
-          ui.value.sample = samples.value[key];
-        }
-        return;
-      }
-    }
+    // modal keys are handled elsewhere
+    if (ui.value.modal) return;
 
     //  play sample
-
     if (samplekeys.includes(key)) {
       if (ev.ctrlKey) return;
       const sample = samples.value[key];
@@ -153,13 +117,12 @@ export function useKeyboard(
 
   const keyup = (ev: KeyboardEvent) => {
     const { key } = ev;
+    sources[key]?.stop();
+    // clear & reload
     const sample = samples.value[key];
     if (!sample) return;
-    // stop
-    sources[key]?.stop();
     sample.held = false;
     if (!sample?.active) return;
-
     const buffer = buffers.value[sample.bufferid];
     const source = loadAudioSource(buffer, 1.0);
     sources[key] = source;
