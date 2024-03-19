@@ -89,7 +89,12 @@ const openCopyModal = () => {
             </li>
             <li>
               Dig in the Archive's
-              <a href="https://archive.org/details/78rpm" className="underline">
+              <a
+                href="https://archive.org/details/78rpm"
+                className="underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 78 RPMs collection
               </a>
             </li>

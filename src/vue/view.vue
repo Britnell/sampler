@@ -41,7 +41,7 @@ const addEnd = () => {
         <span v-if="ui.sample.end"> - {{ ui.sample.end?.toFixed(2) }} </span>
         ]
       </p>
-      <button class="primary" @click="emit('removeKey')">remove</button>
+      <span></span>
     </div>
     <Sampleviz
       :buffer="buffers[ui.sample.bufferid]"
@@ -55,34 +55,49 @@ const addEnd = () => {
           v-if="ui.edit === 'begin'"
           @click="ui.edit = null"
         >
-          finish
+          done
         </button>
         <button class="primary" v-else @click="ui.edit = 'begin'">
           Edit begin
         </button>
       </div>
       <div>
-        <button class="primary" v-if="!ui.sample.end" @click="addEnd">
-          add end
-        </button>
-        <button
-          class="primary"
-          v-else-if="ui.edit === 'end'"
-          @click="ui.edit = null"
-        >
-          finish
-        </button>
-        <div v-else class="flex flex-col gap-2">
-          <button class="primary" @click="ui.edit = 'end'">Edit End</button>
-          <button class="primary" @click="ui.sample.end = null">
-            Remove end
-          </button>
+        <div class="flex flex-col gap-2">
+          <div>
+            <button
+              class="primary"
+              v-if="ui.sample.end === null"
+              @click="addEnd"
+            >
+              add end
+            </button>
+            <button
+              class="primary"
+              v-else-if="ui.edit === 'end'"
+              @click="ui.edit = null"
+            >
+              done
+            </button>
+            <button v-else class="primary" @click="ui.edit = 'end'">
+              Edit End
+            </button>
+          </div>
+          <div>
+            <button
+              class="primary"
+              :class="ui.sample.end !== null ? '' : ' invisible'"
+              @click="ui.sample.end = null"
+            >
+              Remove end
+            </button>
+          </div>
         </div>
       </div>
     </div>
     <div class="x">
+      <p>Move sample:</p>
       <div class="flex gap-4">
-        <p>Duplicate sample:</p>
+        <button class="primary" @click="emit('removeKey')">remove</button>
         <button class="primary" @click="emit('openCopyModal')">copy</button>
         <button class="primary" @click="emit('openSpliceModal')">splice</button>
       </div>
