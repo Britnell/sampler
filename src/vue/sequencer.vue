@@ -4,7 +4,6 @@ import {
   toRefs,
   defineEmits,
   ref,
-  watchEffect,
   onMounted,
   onUnmounted,
   computed,
@@ -66,7 +65,6 @@ const start = () => {
 
 const beatTime = (t: number) => {
   if (!state.value.begin) return 0;
-
   const tbar = 60 / state.value.bpm;
   const total = state.value.bars * tbar;
   const diff = (t - state.value.begin) / 1000;
@@ -84,10 +82,9 @@ const startSequencer = () => {
         const sample = samples.value[seq.key];
         if (!sample) return;
         if (seq.dir === "down") {
-          // console.log(" PLAY ", seq);
           playSample(sample);
-        } else {
-          // console.log(" stop", seq);
+        }
+        if (seq.dir === "up") {
           stopSample(sample);
           const buffer = buffers.value[sample.bufferid];
           loadSample(sample, buffer);
