@@ -11,7 +11,7 @@ import {
 import { type Ui, type BufferState, type SamplesT } from "./hooks";
 import { beep } from "./audio";
 import { cachedRef } from "./hooks";
-import { loadSample, playSample, stopSample } from "./audio";
+import { playSample, stopSample, stopSampleReload } from "./audio";
 
 const emit = defineEmits([""]);
 
@@ -85,9 +85,8 @@ const startSequencer = () => {
           playSample(sample);
         }
         if (seq.dir === "up") {
-          stopSample(sample);
           const buffer = buffers.value[sample.bufferid];
-          loadSample(sample, buffer);
+          stopSampleReload(sample, buffer);
         }
       }, tbar * seq.b);
       cancelTones.set(seq, t);
@@ -147,6 +146,7 @@ const keyup = (ev: KeyboardEvent) => {
 
 const cancel = () => {
   if (intvl) clearInterval(intvl);
+  // stopAll()
   [...cancelTones.values()].forEach((t) => clearTimeout(t));
 };
 
@@ -174,6 +174,8 @@ const sequenceKeys = computed(() => {
 
 const clearKey = (key: string) => {
   sequence.value = sequence.value.filter((seq) => seq.key !== key);
+  const sample = samples.value[key];
+  if (sample) stopSample(sample);
 };
 </script>
 <template>

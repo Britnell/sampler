@@ -63,8 +63,6 @@ export const loadBufferSource = (
   return source;
 };
 
-export const startNow = () => audioContext.currentTime;
-
 export const beep = (dur: number, f?: number) => {
   const beeper = audioContext.createOscillator();
   const gainNode = audioContext.createGain();
@@ -84,7 +82,11 @@ const sources: Source = {};
 
 export const playSample = (sample: SampleT) => {
   const dur = sample.end ? sample.end - sample.begin : undefined;
-  sources[sample.key]?.start(audioContext.currentTime, sample.begin, dur);
+  try {
+    sources[sample.key]?.start(audioContext.currentTime, sample.begin, dur);
+  } catch (e) {
+    //
+  }
 };
 
 export const stopSample = (sample: SampleT) => {
@@ -99,3 +101,10 @@ export const loadSample = (sample: SampleT, buffer: AudioBuffer) => {
   if (!sample?.active) return;
   sources[sample.key] = loadAudioSource(buffer, 1.0);
 };
+
+export const stopSampleReload = (sample: SampleT, buffer: AudioBuffer) => {
+  stopSample(sample);
+  loadSample(sample, buffer);
+};
+
+export const stopAllSamples = () => {};
