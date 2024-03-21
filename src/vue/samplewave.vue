@@ -2,6 +2,8 @@
 import { ref, defineProps, watchEffect, toRefs, computed } from "vue";
 
 const props = defineProps(["sample", "buffer", "ui"]);
+const emit = defineEmits(["canvasClick"]);
+
 const { sample, buffer, ui } = toRefs(props);
 // const { sample, buffer } = props;
 const canvasref = ref<HTMLCanvasElement>();
@@ -94,10 +96,15 @@ watchEffect(() => {
   // const edit = ui?.value.edit;
   drawFromBegin(canvas.width, canvas.height, start, stop);
 });
+
+const canvasClick = (ev: MouseEvent) => {
+  const rect = (ev.target as HTMLElement).getBoundingClientRect();
+  emit("canvasClick", ev.offsetX / rect.width);
+};
 </script>
 
 <template>
   <div>
-    <canvas ref="canvasref"></canvas>
+    <canvas @click="canvasClick" ref="canvasref"></canvas>
   </div>
 </template>

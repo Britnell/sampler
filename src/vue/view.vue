@@ -21,6 +21,15 @@ const addEnd = () => {
   ui.value.sample.end = ui.value.sample.begin + 0.5;
   ui.value.edit = "end";
 };
+
+const canvasClick = (pos: number) => {
+  if (!ui.value.edit) {
+    // if (pos < 0.3) ui.value.edit = "begin";
+    // if (pos > 0.7) ui.value.edit = "end";
+    return;
+  }
+  console.log(pos);
+};
 </script>
 <template>
   <section
@@ -43,11 +52,35 @@ const addEnd = () => {
       </p>
       <span></span>
     </div>
-    <Sampleviz
-      :buffer="buffers[ui.sample.bufferid]"
-      :sample="ui.sample"
-      :ui="ui"
-    />
+    <div class="relative">
+      <Sampleviz
+        :buffer="buffers[ui.sample.bufferid]"
+        :sample="ui.sample"
+        :ui="ui"
+        @canvasClick="canvasClick"
+      />
+      <button
+        v-if="!ui.edit"
+        class="absolute top-0 bottom-0 left-0 right-[75%] bg-white bg-opacity-10 opacity-0 hover:opacity-100"
+        @click="ui.edit = 'begin'"
+      >
+        edit begin
+      </button>
+      <button
+        v-if="!ui.edit && !ui.sample.end"
+        class="absolute top-0 bottom-0 right-0 left-[75%] bg-white bg-opacity-10 opacity-0 hover:opacity-100"
+        @click="addEnd"
+      >
+        add end
+      </button>
+      <button
+        v-if="!ui.edit && ui.sample.end"
+        class="absolute top-0 bottom-0 right-0 left-[75%] bg-white bg-opacity-10 opacity-0 hover:opacity-100"
+        @click="ui.edit = 'end'"
+      >
+        edit end
+      </button>
+    </div>
     <div class="flex justify-between">
       <div>
         <button
