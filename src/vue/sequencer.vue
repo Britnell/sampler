@@ -180,17 +180,36 @@ const clearKey = (key: string) => {
 </script>
 <template>
   <section>
-    <h2>Sequencer</h2>
-    <div>
+    <h2 class="text-xl font-bold">Sequencer</h2>
+    <div class="my-6 flex gap-6">
+      <div>
+        <button v-if="!state.active" class="primary" @click="start">
+          start
+        </button>
+        <button v-else class="primary" @click="stop">stop</button>
+      </div>
       <p>count : {{ count }}</p>
     </div>
-    <div>
-      <button v-if="!state.active" class="primary" @click="start">start</button>
-      <button v-else class="primary" @click="stop">stop</button>
+    <div class="x">
+      <label>BPM : </label>
+      <input
+        type="number"
+        :value="state.bpm"
+        @input="state.bpm = $event.target.value"
+        class="bg-transparent w-16"
+      />
+      <input
+        type="range"
+        min="40"
+        max="140"
+        :value="state.bpm"
+        @input="state.bpm = $event.target.value"
+        class="w-[200px]"
+      />
     </div>
-    <div>
+    <div class="my-6">
       <h2>Clear keys from sequence</h2>
-      <ul class="list-disc ml-6">
+      <ul class="list-disc ml-6 grid grid-cols-[200px_200px]">
         <li v-for="key in sequenceKeys">
           <span>
             {{ key }}
