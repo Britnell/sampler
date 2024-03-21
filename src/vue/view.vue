@@ -3,7 +3,12 @@ import { defineProps, toRefs, defineEmits } from "vue";
 import { type Ui, type BufferState, type SamplesT } from "./hooks";
 import Sampleviz from "./samplewave.vue";
 
-const emit = defineEmits(["removeKey", "openCopyModal", "openSpliceModal"]);
+const emit = defineEmits([
+  "removeKey",
+  "openCopyModal",
+  "openMoveModal",
+  "openSpliceModal",
+]);
 
 const props = defineProps(["buffers", "ui", "samples"]);
 
@@ -99,6 +104,7 @@ const addEnd = () => {
       <div class="flex gap-4">
         <button class="primary" @click="emit('removeKey')">remove</button>
         <button class="primary" @click="emit('openCopyModal')">copy</button>
+        <button class="primary" @click="emit('openMoveModal')">move</button>
         <button class="primary" @click="emit('openSpliceModal')">splice</button>
       </div>
     </div>

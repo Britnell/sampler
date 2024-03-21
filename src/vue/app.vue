@@ -49,6 +49,12 @@ const openCopyModal = () => {
   };
 };
 
+const openMoveModal = () => {
+  ui.value.modal = {
+    type: "move",
+  };
+};
+
 const keydown = (ev: KeyboardEvent) => {
   const { key } = ev;
 
@@ -71,6 +77,18 @@ const keydown = (ev: KeyboardEvent) => {
   if (ui.value.modal?.type === "copy") {
     if (ui.value.sample && !samples.value[key]?.active) {
       samples.value[key] = { ...ui.value.sample, key };
+      ui.value.modal = null;
+      ui.value.sample = samples.value[key];
+    }
+    return;
+  }
+  if (ui.value.modal?.type === "move") {
+    if (ui.value.sample && !samples.value[key]?.active) {
+      const current = ui.value.sample.key;
+      console.log(current, samples.value[current]);
+      // assign
+      samples.value[key] = { ...ui.value.sample, key };
+      if (ui.value.sample) ui.value.sample.active = false;
       ui.value.modal = null;
       ui.value.sample = samples.value[key];
     }
@@ -149,6 +167,7 @@ onUnmounted(() => {
           :samples="samples"
           @removeKey="removeKey"
           @openCopyModal="openCopyModal"
+          @openMoveModal="openMoveModal"
           @openSpliceModal="openSpliceModal"
         />
       </div>
@@ -170,6 +189,9 @@ onUnmounted(() => {
       </Modal>
       <Modal :isOpen="ui.modal?.type === 'copy'" @close="ui.modal = null">
         <p>press a key to copy to</p>
+      </Modal>
+      <Modal :isOpen="ui.modal?.type === 'move'" @close="ui.modal = null">
+        <p>press a key to move to</p>
       </Modal>
       <Modal :isOpen="ui.modal?.type === 'splice'" @close="ui.modal = null">
         <p>press a key to splice to</p>
