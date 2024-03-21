@@ -173,11 +173,13 @@ onUnmounted(() => {
     />
     <section>
       <Modal :isOpen="ui.modal?.type" @close="ui.modal = null">
-        <p v-if="ui.modal?.type === 'assign'">press a key to assign</p>
-        <p v-if="ui.modal?.type === 'copy'">press a key to copy to</p>
-        <p v-if="ui.modal?.type === 'move'">press a key to move to</p>
-        <p v-if="ui.modal?.type === 'splice'">press a key to splice to</p>
-        <p v-if="ui.modal?.type === 'remove'">confirm w 'SPACE' or 'ENTER'</p>
+        <p v-if="ui.modal?.type === 'assign'">press a key to ASSIGN</p>
+        <p v-if="ui.modal?.type === 'copy'">press a key to COPY to</p>
+        <p v-if="ui.modal?.type === 'move'">press a key to MOVE to</p>
+        <p v-if="ui.modal?.type === 'splice'">press a key to SPLICE to</p>
+        <p v-if="ui.modal?.type === 'remove'">
+          REMOVE? press 'SPACE' or 'ENTER' to confirm
+        </p>
       </Modal>
       <Modal :isOpen="ui.loading">
         <p>LOADING...</p>
