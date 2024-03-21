@@ -28,32 +28,19 @@ const openSampleModal = (val: string) => {
     value: val,
   };
 };
-const openSpliceModal = () => {
-  ui.value.modal = {
-    type: "splice",
-  };
-};
 
 const viewSample = (sample: SampleT | null) => {
   if (!sample?.active) return;
   ui.value.sample = sample;
 };
 
-const removeKey = () => {
-  if (ui.value.sample) ui.value.sample.active = false;
-};
-
-const openCopyModal = () => {
+const openModal = (val: string) => {
   ui.value.modal = {
-    type: "copy",
+    type: val,
   };
 };
 
-const openMoveModal = () => {
-  ui.value.modal = {
-    type: "move",
-  };
-};
+const closeModal = () => (ui.value.modal = null);
 
 const keydown = (ev: KeyboardEvent) => {
   const { key } = ev;
@@ -71,27 +58,31 @@ const keydown = (ev: KeyboardEvent) => {
         bufferid: id,
         held: false,
       };
-    ui.value.modal = null;
+    closeModal();
     return;
   }
   if (ui.value.modal?.type === "copy") {
     if (ui.value.sample && !samples.value[key]?.active) {
       samples.value[key] = { ...ui.value.sample, key };
-      ui.value.modal = null;
+      closeModal();
       ui.value.sample = samples.value[key];
     }
     return;
   }
   if (ui.value.modal?.type === "move") {
     if (ui.value.sample && !samples.value[key]?.active) {
-      const current = ui.value.sample.key;
-      console.log(current, samples.value[current]);
-      // assign
       samples.value[key] = { ...ui.value.sample, key };
       if (ui.value.sample) ui.value.sample.active = false;
-      ui.value.modal = null;
+      closeModal();
       ui.value.sample = samples.value[key];
     }
+    return;
+  }
+  if (ui.value.modal.type === "remove") {
+    if ([" ", "Enter"].includes(key)) {
+      if (ui.value.sample) ui.value.sample.active = false;
+    }
+    closeModal();
     return;
   }
   if (ui.value.modal?.type === "splice") {
@@ -100,9 +91,9 @@ const keydown = (ev: KeyboardEvent) => {
       if (copy.end) {
         copy.begin = copy.end;
         copy.end = copy.begin + 0.6;
-      }
+      } else copy.begin = copy.begin + 0.6;
       samples.value[key] = copy;
-      ui.value.modal = null;
+      closeModal();
       ui.value.sample = samples.value[key];
     }
     return;
@@ -165,10 +156,7 @@ onUnmounted(() => {
           :ui="ui"
           :buffers="buffers"
           :samples="samples"
-          @removeKey="removeKey"
-          @openCopyModal="openCopyModal"
-          @openMoveModal="openMoveModal"
-          @openSpliceModal="openSpliceModal"
+          @openModal="openModal"
         />
       </div>
       <div v-if="tab === 'sequencer'" class="seq">
@@ -184,17 +172,12 @@ onUnmounted(() => {
       @viewSample="viewSample"
     />
     <section>
-      <Modal :isOpen="ui.modal?.type === 'assign'" @close="ui.modal = null">
-        <p>press a key to assign</p>
-      </Modal>
-      <Modal :isOpen="ui.modal?.type === 'copy'" @close="ui.modal = null">
-        <p>press a key to copy to</p>
-      </Modal>
-      <Modal :isOpen="ui.modal?.type === 'move'" @close="ui.modal = null">
-        <p>press a key to move to</p>
-      </Modal>
-      <Modal :isOpen="ui.modal?.type === 'splice'" @close="ui.modal = null">
-        <p>press a key to splice to</p>
+      <Modal :isOpen="ui.modal?.type" @close="ui.modal = null">
+        <p v-if="ui.modal?.type === 'assign'">press a key to assign</p>
+        <p v-if="ui.modal?.type === 'copy'">press a key to copy to</p>
+        <p v-if="ui.modal?.type === 'move'">press a key to move to</p>
+        <p v-if="ui.modal?.type === 'splice'">press a key to splice to</p>
+        <p v-if="ui.modal?.type === 'remove'">confirm w 'SPACE' or 'ENTER'</p>
       </Modal>
       <Modal :isOpen="ui.loading">
         <p>LOADING...</p>
