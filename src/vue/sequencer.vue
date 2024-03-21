@@ -29,7 +29,7 @@ type State = {
   begin: null | number;
   bpm: number;
   bars: number;
-  quantize: number;
+  quantize: number | null;
   metronome: boolean;
 };
 const state = ref<State>({
@@ -38,7 +38,7 @@ const state = ref<State>({
   begin: null,
   bpm: 90,
   bars: 8,
-  quantize: 0.5,
+  quantize: null,
   metronome: true,
 });
 
@@ -242,6 +242,20 @@ const clearKey = (key: string) => {
           class="w-[200px]"
         />
       </div>
+      <!-- <div class="flex gap-3">
+        <label>quantize : </label>
+        <select
+          :value="state.quantize"
+          @input="state.quantize = $event.target.value"
+          class="bg-transparent w-16 text-white"
+        >
+          <option class="text-black" value="0.5">1/2</option>
+          <option class="text-black" value="0.25">1/4</option>
+          <option class="text-black" value="0.125">1/8</option>
+          <option class="text-black" value="0.0625">1/16</option>
+          <option class="text-black" value="0.03125">1/32</option>
+        </select>
+      </div> -->
     </div>
     <div class="my-6">
       <h2>Clear keys from sequence</h2>
