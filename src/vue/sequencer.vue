@@ -193,23 +193,6 @@ const clearKey = (key: string) => {
         </div>
         <p>count : {{ count }}</p>
       </div>
-      <div class="x">
-        <label>BPM : </label>
-        <input
-          type="number"
-          :value="state.bpm"
-          @input="state.bpm = $event.target.value"
-          class="bg-transparent w-16"
-        />
-        <input
-          type="range"
-          min="40"
-          max="140"
-          :value="state.bpm"
-          @input="state.bpm = $event.target.value"
-          class="w-[200px]"
-        />
-      </div>
       <div>
         <label class="flex items-center gap-4"
           >Metronome :
@@ -220,6 +203,44 @@ const clearKey = (key: string) => {
           />
           <span> {{ state.metronome ? "ON" : "OFF" }} </span>
         </label>
+      </div>
+      <div class="flex gap-3">
+        <label>BPM : </label>
+        <input
+          type="number"
+          name="bpm"
+          :value="state.bpm"
+          @input="state.bpm = $event.target.value"
+          class="bg-transparent w-16"
+        />
+        <input
+          type="range"
+          name="bpm"
+          min="40"
+          max="140"
+          :value="state.bpm"
+          @input="state.bpm = $event.target.value"
+          class="w-[200px]"
+        />
+      </div>
+      <div class="flex gap-3">
+        <label>bars : </label>
+        <input
+          type="number"
+          name="bpm"
+          :value="state.bars"
+          @input="state.bars = $event.target.value"
+          class="bg-transparent w-16"
+        />
+        <input
+          type="range"
+          name="bpm"
+          min="4"
+          max="32"
+          :value="state.bars"
+          @input="state.bars = $event.target.value"
+          class="w-[200px]"
+        />
       </div>
     </div>
     <div class="my-6">
