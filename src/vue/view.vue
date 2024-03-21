@@ -30,7 +30,9 @@ const dragSamplePos = (drag: number) => {
 
   const buffer = buffers.value[sample.bufferid];
   const pos = sample[edit] ?? 0;
-  let next = limit(pos - drag / 100, 0, buffer.duration);
+  const dir = edit === "begin" ? -1 : 1;
+
+  let next = limit(pos + (dir * drag) / 100, 0, buffer.duration);
   if (edit === "begin" && sample?.end && next > sample.end) sample.end = null;
   if (edit === "end" && next < sample.begin) next = sample.begin;
   sample[edit] = next;
