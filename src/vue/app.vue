@@ -79,10 +79,10 @@ const keydown = (ev: KeyboardEvent) => {
     return;
   }
   if (ui.value.modal.type === "remove") {
-    if ([" ", "Enter"].includes(key)) {
+    if (key === ui.value.sample?.key) {
       if (ui.value.sample) ui.value.sample.active = false;
+      closeModal();
     }
-    closeModal();
     return;
   }
   if (ui.value.modal?.type === "splice") {
@@ -177,9 +177,7 @@ onUnmounted(() => {
         <p v-if="ui.modal?.type === 'copy'">press a key to COPY to</p>
         <p v-if="ui.modal?.type === 'move'">press a key to MOVE to</p>
         <p v-if="ui.modal?.type === 'splice'">press a key to SPLICE to</p>
-        <p v-if="ui.modal?.type === 'remove'">
-          REMOVE? press 'SPACE' or 'ENTER' to confirm
-        </p>
+        <p v-if="ui.modal?.type === 'remove'">confirm key to delete it</p>
       </Modal>
       <Modal :isOpen="ui.loading">
         <p>LOADING...</p>

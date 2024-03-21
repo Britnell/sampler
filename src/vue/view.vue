@@ -140,11 +140,11 @@ const dragSamplePos = (drag: number) => {
     <div class="x">
       <p>Move sample:</p>
       <div class="flex gap-4">
-        <button class="primary" @click="emit('openModal', 'copy')">copy</button>
-        <button class="primary" @click="emit('openModal', 'move')">move</button>
         <button class="primary" @click="emit('openModal', 'remove')">
           remove
         </button>
+        <button class="primary" @click="emit('openModal', 'move')">move</button>
+        <button class="primary" @click="emit('openModal', 'copy')">copy</button>
         <button class="primary" @click="emit('openModal', 'splice')">
           splice
         </button>
