@@ -56,7 +56,6 @@ export function useKeyboard(
   buffers: Ref<BufferState>,
   settings: Ref<Settings>
 ) {
-  const sources: { [id: string]: AudioBufferSourceNode | null } = {};
   const samplekeys = "1234567890qwertyuiopasdfghjklzxcvbnm";
 
   const keydown = (ev: KeyboardEvent) => {

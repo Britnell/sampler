@@ -2,6 +2,7 @@
 import { defineProps, toRefs, defineEmits } from "vue";
 import { type Ui, type BufferState, type SamplesT } from "./hooks";
 import Sampleviz from "./samplewave.vue";
+import { limit } from "./lib";
 
 const emit = defineEmits(["openModal"]);
 
@@ -22,13 +23,17 @@ const addEnd = () => {
   ui.value.edit = "end";
 };
 
-const canvasClick = (pos: number) => {
-  if (!ui.value.edit) {
-    // if (pos < 0.3) ui.value.edit = "begin";
-    // if (pos > 0.7) ui.value.edit = "end";
-    return;
-  }
-  console.log(pos);
+const dragSamplePos = (drag: number) => {
+  const sample = ui.value.sample;
+  const edit = ui.value.edit;
+  if (!edit || !sample) return;
+
+  const buffer = buffers.value[sample.bufferid];
+  const pos = sample[edit] ?? 0;
+  let next = limit(pos - drag / 100, 0, buffer.duration);
+  if (edit === "begin" && sample?.end && next > sample.end) sample.end = null;
+  if (edit === "end" && next < sample.begin) next = sample.begin;
+  sample[edit] = next;
 };
 </script>
 <template>
@@ -57,7 +62,7 @@ const canvasClick = (pos: number) => {
         :buffer="buffers[ui.sample.bufferid]"
         :sample="ui.sample"
         :ui="ui"
-        @canvasClick="canvasClick"
+        @mouseDrag="dragSamplePos"
       />
       <button
         v-if="!ui.edit"
@@ -84,7 +89,7 @@ const canvasClick = (pos: number) => {
     <div class="flex justify-between">
       <div>
         <button
-          class="primary"
+          class="primary bg-white text-black"
           v-if="ui.edit === 'begin'"
           @click="ui.edit = null"
         >
@@ -93,6 +98,9 @@ const canvasClick = (pos: number) => {
         <button class="primary" v-else @click="ui.edit = 'begin'">
           Edit begin
         </button>
+      </div>
+      <div>
+        <p v-if="ui.edit">use arrow keys / drag w mouse</p>
       </div>
       <div>
         <div class="flex flex-col gap-2">
@@ -105,7 +113,7 @@ const canvasClick = (pos: number) => {
               add end
             </button>
             <button
-              class="primary"
+              class="primary bg-white text-black"
               v-else-if="ui.edit === 'end'"
               @click="ui.edit = null"
             >

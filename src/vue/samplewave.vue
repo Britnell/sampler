@@ -2,7 +2,7 @@
 import { ref, defineProps, watchEffect, toRefs, computed } from "vue";
 
 const props = defineProps(["sample", "buffer", "ui"]);
-const emit = defineEmits(["canvasClick"]);
+const emit = defineEmits(["mouseDrag"]);
 
 const { sample, buffer, ui } = toRefs(props);
 // const { sample, buffer } = props;
@@ -97,14 +97,15 @@ watchEffect(() => {
   drawFromBegin(canvas.width, canvas.height, start, stop);
 });
 
-const canvasClick = (ev: MouseEvent) => {
-  const rect = (ev.target as HTMLElement).getBoundingClientRect();
-  emit("canvasClick", ev.offsetX / rect.width);
+const drag = (ev: MouseEvent) => {
+  if (!ui?.value.edit) return;
+  if (ev.buttons !== 1) return;
+  emit("mouseDrag", ev.movementX);
 };
 </script>
 
 <template>
   <div>
-    <canvas @click="canvasClick" ref="canvasref"></canvas>
+    <canvas @mousemove="drag" ref="canvasref"></canvas>
   </div>
 </template>
