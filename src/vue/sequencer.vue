@@ -30,6 +30,7 @@ type State = {
   bpm: number;
   bars: number;
   quantize: number;
+  metronome: boolean;
 };
 const state = ref<State>({
   active: false,
@@ -38,6 +39,7 @@ const state = ref<State>({
   bpm: 90,
   bars: 8,
   quantize: 0.5,
+  metronome: true,
 });
 
 const { ui, buffers, samples } = toRefs<Props>(props as Props);
@@ -94,7 +96,7 @@ const startSequencer = () => {
   };
 
   const sequencer = () => {
-    beep(20, c === 0 ? 1200 : 1000);
+    if (state.value.metronome) beep(20, c % 4 === 0 ? 1200 : 1000);
 
     if (c === 0) timeBarSeqs();
 
@@ -181,31 +183,44 @@ const clearKey = (key: string) => {
 <template>
   <section>
     <h2 class="text-xl font-bold">Sequencer</h2>
-    <div class="my-6 flex gap-6">
-      <div>
-        <button v-if="!state.active" class="primary" @click="start">
-          start
-        </button>
-        <button v-else class="primary" @click="stop">stop</button>
+    <div class="p-6 border-l border-white">
+      <div class="mb-6 flex gap-6">
+        <div>
+          <button v-if="!state.active" class="primary" @click="start">
+            start
+          </button>
+          <button v-else class="primary" @click="stop">stop</button>
+        </div>
+        <p>count : {{ count }}</p>
       </div>
-      <p>count : {{ count }}</p>
-    </div>
-    <div class="x">
-      <label>BPM : </label>
-      <input
-        type="number"
-        :value="state.bpm"
-        @input="state.bpm = $event.target.value"
-        class="bg-transparent w-16"
-      />
-      <input
-        type="range"
-        min="40"
-        max="140"
-        :value="state.bpm"
-        @input="state.bpm = $event.target.value"
-        class="w-[200px]"
-      />
+      <div class="x">
+        <label>BPM : </label>
+        <input
+          type="number"
+          :value="state.bpm"
+          @input="state.bpm = $event.target.value"
+          class="bg-transparent w-16"
+        />
+        <input
+          type="range"
+          min="40"
+          max="140"
+          :value="state.bpm"
+          @input="state.bpm = $event.target.value"
+          class="w-[200px]"
+        />
+      </div>
+      <div>
+        <label class="flex items-center gap-4"
+          >Metronome :
+          <input
+            type="checkbox"
+            :checked="state.metronome"
+            @input="state.metronome = $event.target.checked"
+          />
+          <span> {{ state.metronome ? "ON" : "OFF" }} </span>
+        </label>
+      </div>
     </div>
     <div class="my-6">
       <h2>Clear keys from sequence</h2>
