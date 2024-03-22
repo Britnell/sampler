@@ -144,6 +144,7 @@ const dragSamplePos = (drag: number) => {
           remove
         </button>
         <button class="primary" @click="emit('openModal', 'move')">move</button>
+        <button class="primary" xclick="emit('openModal', 'move')">swap</button>
         <button class="primary" @click="emit('openModal', 'copy')">copy</button>
         <button class="primary" @click="emit('openModal', 'splice')">
           splice

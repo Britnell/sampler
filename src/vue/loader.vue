@@ -59,7 +59,7 @@ const loadFromUrl = (ev: Event) => {
   <div class="">
     <div class="border border-white p-4">
       <h2 class="text-xl font-bold">load audio</h2>
-      <div className=" grid grid-cols-3 gap-10 ">
+      <div className=" grid grid-cols-2 gap-10 ">
         <div class="">
           <label className=" mb-3 block" for="fileip">load local file :</label>
           <input

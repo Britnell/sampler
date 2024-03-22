@@ -15,6 +15,7 @@ import View from "./view.vue";
 import Finder from "./find.vue";
 import Sequencer from "./sequencer.vue";
 import { onMounted, onUnmounted } from "vue";
+import { samplesDbRemove } from "./indexdb";
 
 const buffers = refBuffers();
 const samples = refSamples();
@@ -22,22 +23,16 @@ const ui = refUi();
 const settings = refSettings();
 const tab = refTab("main");
 
-const openSampleModal = (val: string) => {
+const opanModal = (type: string, value?: string) => {
   ui.value.modal = {
-    type: "assign",
-    value: val,
+    type,
+    value,
   };
 };
 
 const viewSample = (sample: SampleT | null) => {
   if (!sample?.active) return;
   ui.value.sample = sample;
-};
-
-const openModal = (val: string) => {
-  ui.value.modal = {
-    type: val,
-  };
 };
 
 const closeModal = () => (ui.value.modal = null);
@@ -59,6 +54,16 @@ const keydown = (ev: KeyboardEvent) => {
         held: false,
       };
     closeModal();
+    return;
+  }
+  if (ui.value.modal?.type === "deletebuffer") {
+    if (key === "Enter") {
+      const id = ui.value.modal.value;
+      if (!id) return;
+      buffers.value[id] = null;
+      samplesDbRemove(id);
+      closeModal();
+    }
     return;
   }
   if (ui.value.modal?.type === "copy") {
@@ -131,7 +136,12 @@ onUnmounted(() => {
       <div v-if="tab === 'main'" class="view relative">
         <div class="x">
           <Loader :ui="ui" :buffers="buffers" />
-          <Assign :ui="ui" :buffers="buffers" @assign="openSampleModal" />
+          <Assign
+            :ui="ui"
+            :buffers="buffers"
+            @assign="(key) => opanModal('assign', key)"
+            @delete="(key) => opanModal('deletebuffer', key)"
+          />
           <section>
             <h2 class="text-xl font-bold">settings</h2>
             <div class="x">
@@ -156,7 +166,7 @@ onUnmounted(() => {
           :ui="ui"
           :buffers="buffers"
           :samples="samples"
-          @openModal="openModal"
+          @openModal="opanModal"
         />
       </div>
       <div v-if="tab === 'sequencer'" class="seq">
@@ -178,6 +188,9 @@ onUnmounted(() => {
         <p v-if="ui.modal?.type === 'move'">press a key to MOVE to</p>
         <p v-if="ui.modal?.type === 'splice'">press a key to SPLICE to</p>
         <p v-if="ui.modal?.type === 'remove'">confirm key to delete it</p>
+        <p v-if="ui.modal?.type === 'deletebuffer'">
+          Press ENTER to remove source
+        </p>
       </Modal>
       <Modal :isOpen="ui.loading">
         <p>LOADING...</p>

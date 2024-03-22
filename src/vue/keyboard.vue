@@ -36,7 +36,7 @@ useKeyboard(ui, samples, buffers, settings);
       >
         <button
           v-for="k in row"
-          class="flex-initial w-[min(6vw,80px)] h-[min(6vw,80px)] aspect-square border border-white p-2 box-content"
+          class="flex-initial w-[min(5vw,64px)] h-[min(5vw,64px)] aspect-square border border-white p-2 box-content"
           :class="
             samples[k]?.held
               ? ' bg-blue-400 bg-opacity-50'

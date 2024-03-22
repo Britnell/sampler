@@ -9,7 +9,7 @@ import {
 import { loadSample, playSample, stopSampleReload } from "./audio";
 import { limit } from "./lib";
 
-export type BufferState = { [name: string]: AudioBuffer };
+export type BufferState = { [name: string]: AudioBuffer | null };
 
 export type SampleT = {
   key: string;
@@ -93,6 +93,7 @@ export function useKeyboard(
       };
       if (!keyVals[key]) return;
       const buffer = buffers.value[sample.bufferid];
+      if (!buffer) return;
 
       const pos = sample[edit] ?? 0;
       let next = limit(pos + keyVals[key] * fine, 0, buffer.duration);
@@ -120,6 +121,7 @@ export function useKeyboard(
     const sample = samples.value[key];
     if (!sample) return;
     const buffer = buffers.value[sample.bufferid];
+    if (!buffer) return;
     stopSampleReload(sample, buffer);
     sample.held = false;
   };
@@ -139,6 +141,7 @@ export function useKeyboard(
     Object.values(samples.value).forEach((sample) => {
       if (!sample) return;
       const buffer = buffers.value[sample.bufferid];
+      if (!buffer) return;
       loadSample(sample, buffer);
     });
   });
