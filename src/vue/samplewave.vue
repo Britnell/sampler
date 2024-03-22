@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import { ref, defineProps, watchEffect, toRefs, computed } from "vue";
+import type { SampleT, Ui } from "./hooks";
 
 const props = defineProps(["sample", "buffer", "ui"]);
 const emit = defineEmits(["mouseDrag"]);
 
-const { sample, buffer, ui } = toRefs(props);
+type Props = {
+  ui: Ui;
+  buffer: AudioBuffer;
+  sample: SampleT;
+};
+const { sample, buffer, ui } = toRefs<Props>(props as Props);
 // const { sample, buffer } = props;
 const canvasref = ref<HTMLCanvasElement>();
 

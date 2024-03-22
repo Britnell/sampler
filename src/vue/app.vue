@@ -6,6 +6,7 @@ import {
   refUi,
   refSettings,
   refTab,
+  refEffect,
 } from "./hooks";
 import Modal from "./modal.vue";
 import Assign from "./assign.vue";
@@ -14,14 +15,16 @@ import Keyboard from "./keyboard.vue";
 import View from "./view.vue";
 import Finder from "./find.vue";
 import Sequencer from "./sequencer.vue";
-import { onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted, watchEffect } from "vue";
 import { samplesDbRemove } from "./indexdb";
+import { clearPassFilter, setPassFilter } from "./audio";
 
 const buffers = refBuffers();
 const samples = refSamples();
 const ui = refUi();
 const settings = refSettings();
 const tab = refTab("main");
+const effect = refEffect();
 
 const opanModal = (type: string, value?: string) => {
   ui.value.modal = {
@@ -117,6 +120,13 @@ onUnmounted(() => {
   window.removeEventListener("keydown", keydown);
   // window.removeEventListener("keyup", keyup);
 });
+
+watchEffect(() => {
+  const filter = effect.value.filter;
+  if (["lowpass", "highpass"].includes(filter.type)) {
+    setPassFilter(filter.type as "lowpass", filter.freq);
+  } else clearPassFilter();
+});
 </script>
 <template>
   <header class="max-w-[1000px] mx-auto px-8">
@@ -125,7 +135,7 @@ onUnmounted(() => {
     </div>
     <div class="flex gap-4 mb-8 border-b border-white">
       <button
-        v-for="t in (['main', 'sequencer'] as const)"
+        v-for="t in (['main', 'sequencer','filter'] as const)"
         class="border border-white px-2 py-1"
         :class="t === tab ? ' bg-white text-black ' : ''"
         @click="tab = t"
@@ -149,6 +159,7 @@ onUnmounted(() => {
             <h2 class="text-xl font-bold">settings</h2>
             <div class="x">
               <label>switch preview window</label>
+              {{ settings.openView }}
               <select
                 class="bg-transparent ip primary"
                 x-model="settings.openView"
@@ -174,6 +185,52 @@ onUnmounted(() => {
       </div>
       <div v-if="tab === 'sequencer'" class="seq">
         <Sequencer :ui="ui" :buffers="buffers" :samples="samples" />
+      </div>
+      <div v-if="tab === 'filter'" class="filter">
+        <h2>High- / Low-pass</h2>
+        <div>
+          <select
+            :value="effect.filter?.type"
+            @input="
+              effect.filter = {
+                freq: 500,
+                ...effect.filter,
+                type: ($event.target as HTMLInputElement).value as
+                  | 'lowpass'
+                  | 'highpass',
+              }
+            "
+            class="bg-transparent ip primary"
+          >
+            <option class="text-black" value="none">none</option>
+            <option class="text-black" value="lowpass">lowpass</option>
+            <option class="text-black" value="highpass">highpass</option>
+          </select>
+        </div>
+        <div>
+          <label for=""> Freq : </label>
+          <input
+            type="number"
+            class="bg-transparent w-16"
+            :value="effect.filter?.freq"
+            @input="
+              if (effect.filter)
+                effect.filter.freq = +($event.target as HTMLInputElement).value;
+            "
+          />
+          <input
+            type="range"
+            class="w-[200px]"
+            min="20"
+            max="20000"
+            step="10"
+            :value="effect.filter?.freq"
+            @input="
+              if (effect.filter)
+                effect.filter.freq = +($event.target as HTMLInputElement).value;
+            "
+          />
+        </div>
       </div>
     </div>
 

@@ -10,6 +10,25 @@ declare global {
 export const audioContext = new (window.AudioContext ||
   window.webkitAudioContext)();
 
+export let passFilter: null | BiquadFilterNode;
+
+export const clearPassFilter = () => (passFilter = null);
+
+export const setPassFilter = (type: "highpass" | "lowpass", f: number) => {
+  passFilter = audioContext.createBiquadFilter();
+  passFilter.type = type;
+  passFilter.frequency.value = f;
+};
+
+const outputFilteredSource = (source: AudioBufferSourceNode) => {
+  if (!passFilter) {
+    source.connect(audioContext.destination);
+  } else if (passFilter) {
+    source.connect(passFilter);
+    passFilter.connect(audioContext.destination);
+  }
+};
+
 export const loadAudioSource = (
   buffer: AudioBuffer | void,
   speed: number = 1.0
@@ -18,7 +37,7 @@ export const loadAudioSource = (
   const source = audioContext.createBufferSource();
   source.buffer = buffer;
   source.playbackRate.value = speed;
-  source.connect(audioContext.destination);
+  outputFilteredSource(source);
   return source;
 };
 
@@ -51,17 +70,17 @@ export const loadArrayBuffer = async (arrayBuffer: ArrayBuffer) => {
   return buffer;
 };
 
-export const loadBufferSource = (
-  buffer: AudioBuffer | void,
-  speed: number = 1.0
-) => {
-  if (!buffer) return null;
-  const source = audioContext.createBufferSource();
-  source.buffer = buffer;
-  source.playbackRate.value = speed;
-  source.connect(audioContext.destination);
-  return source;
-};
+// export const loadBufferSource = (
+//   buffer: AudioBuffer | void,
+//   speed: number = 1.0
+// ) => {
+//   if (!buffer) return null;
+//   const source = audioContext.createBufferSource();
+//   source.buffer = buffer;
+//   source.playbackRate.value = speed;
+//   source.connect(audioContext.destination);
+//   return source;
+// };
 
 export const beep = (dur: number, f?: number) => {
   const beeper = audioContext.createOscillator();
