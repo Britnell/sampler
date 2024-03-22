@@ -53,7 +53,7 @@ export default function Song({
       if (keybounce[key]) return; // key being held
 
       const sample = samples[key];
-      if (!sample?.active) return; // not a sample key
+      if (!sample) return; // not a sample key
       if (sample.bufferid !== bufferId) return; // not for this sample
       // play
       sources.current[key]?.start(audioContext.currentTime, samples[key].begin);
@@ -62,7 +62,7 @@ export default function Song({
 
     const keyup = ({ key }: KeyboardEvent) => {
       const sample = samples[key];
-      if (!sample?.active) return;
+      if (!sample) return;
       if (sample.bufferid !== bufferId) return;
       // stop
       sources.current[key]?.stop();

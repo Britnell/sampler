@@ -31,7 +31,7 @@ const opanModal = (type: string, value?: string) => {
 };
 
 const viewSample = (sample: SampleT | null) => {
-  if (!sample?.active) return;
+  if (!sample) return;
   ui.value.sample = sample;
 };
 
@@ -48,7 +48,6 @@ const keydown = (ev: KeyboardEvent) => {
     if (id)
       samples.value[key] = {
         key,
-        active: true,
         begin: 0,
         bufferid: id,
         held: false,
@@ -62,7 +61,7 @@ const keydown = (ev: KeyboardEvent) => {
       if (!id) return;
       // remove sample keys
       Object.values(samples.value).map((sample) => {
-        if (sample?.bufferid === id) sample.active = false;
+        if (sample?.bufferid === id) sample = null;
       });
       buffers.value[id] = null;
       samplesDbRemove(id);
@@ -71,7 +70,7 @@ const keydown = (ev: KeyboardEvent) => {
     return;
   }
   if (ui.value.modal?.type === "copy") {
-    if (ui.value.sample && !samples.value[key]?.active) {
+    if (ui.value.sample && !samples.value[key]) {
       samples.value[key] = { ...ui.value.sample, key };
       closeModal();
       ui.value.sample = samples.value[key];
@@ -79,9 +78,9 @@ const keydown = (ev: KeyboardEvent) => {
     return;
   }
   if (ui.value.modal?.type === "move") {
-    if (ui.value.sample && !samples.value[key]?.active) {
+    if (ui.value.sample && !samples.value[key]) {
       samples.value[key] = { ...ui.value.sample, key };
-      if (ui.value.sample) ui.value.sample.active = false;
+      samples.value[ui.value.sample.key] = null;
       closeModal();
       ui.value.sample = samples.value[key];
     }
@@ -89,13 +88,13 @@ const keydown = (ev: KeyboardEvent) => {
   }
   if (ui.value.modal.type === "remove") {
     if (key === ui.value.sample?.key) {
-      if (ui.value.sample) ui.value.sample.active = false;
+      samples.value[key] = null;
       closeModal();
     }
     return;
   }
   if (ui.value.modal?.type === "splice") {
-    if (ui.value.sample && !samples.value[key]?.active) {
+    if (ui.value.sample && !samples.value[key]) {
       const copy = { ...ui.value.sample, key };
       if (copy.end) {
         copy.begin = copy.end;

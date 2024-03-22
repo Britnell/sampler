@@ -88,7 +88,7 @@ const startSequencer = () => {
         }
         if (seq.dir === "up") {
           const buffer = buffers.value[sample.bufferid];
-          stopSampleReload(sample, buffer);
+          if (buffer) stopSampleReload(sample, buffer);
         }
       }, tbar * seq.b);
       cancelTones.set(seq, t);
@@ -117,7 +117,7 @@ const keydown = (ev: KeyboardEvent) => {
 
   const sample = samples.value[key];
 
-  if (!sample || !sample.active) return;
+  if (!sample) return;
   if (debounce[key]) return;
   debounce[key] = true;
 
@@ -136,7 +136,7 @@ const keyup = (ev: KeyboardEvent) => {
   const { key } = ev;
   debounce[key] = false;
   const sample = samples.value[key];
-  if (!sample || !sample.active) return;
+  if (!sample) return;
 
   const b = beatTime(t);
   sequence.value.push({
@@ -199,7 +199,9 @@ const clearKey = (key: string) => {
           <input
             type="checkbox"
             :checked="state.metronome"
-            @input="state.metronome = $event.target.checked"
+            @input="
+              state.metronome = ($event.target as HTMLInputElement).checked
+            "
           />
           <span> {{ state.metronome ? "ON" : "OFF" }} </span>
         </label>
@@ -210,7 +212,7 @@ const clearKey = (key: string) => {
           type="number"
           name="bpm"
           :value="state.bpm"
-          @input="state.bpm = $event.target.value"
+          @input="state.bpm = +($event.target as HTMLInputElement).value"
           class="bg-transparent w-16"
         />
         <input
@@ -219,7 +221,7 @@ const clearKey = (key: string) => {
           min="40"
           max="140"
           :value="state.bpm"
-          @input="state.bpm = $event.target.value"
+          @input="state.bpm = +($event.target as HTMLInputElement).value"
           class="w-[200px]"
         />
       </div>
@@ -229,7 +231,7 @@ const clearKey = (key: string) => {
           type="number"
           name="bpm"
           :value="state.bars"
-          @input="state.bars = $event.target.value"
+          @input="state.bars = +($event.target as HTMLInputElement).value"
           class="bg-transparent w-16"
         />
         <input
@@ -238,7 +240,7 @@ const clearKey = (key: string) => {
           min="4"
           max="32"
           :value="state.bars"
-          @input="state.bars = $event.target.value"
+          @input="state.bars = +($event.target as HTMLInputElement).value"
           class="w-[200px]"
         />
       </div>
@@ -246,7 +248,7 @@ const clearKey = (key: string) => {
         <label>quantize : </label>
         <select
           :value="state.quantize"
-          @input="state.quantize = $event.target.value"
+          @input="state.quantize = +($event.target as HTMLInputElement).value"
           class="bg-transparent w-16 text-white"
         >
           <option class="text-black" value="0.5">1/2</option>

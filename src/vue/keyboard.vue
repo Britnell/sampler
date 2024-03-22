@@ -40,7 +40,7 @@ useKeyboard(ui, samples, buffers, settings);
           :class="
             samples[k]?.held
               ? ' bg-blue-400 bg-opacity-50'
-              : samples[k]?.active
+              : samples[k]
               ? ' bg-white bg-opacity-10 '
               : ''
           "

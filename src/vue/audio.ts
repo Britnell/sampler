@@ -98,7 +98,7 @@ export const stopSample = (sample: SampleT) => {
 };
 
 export const loadSample = (sample: SampleT, buffer: AudioBuffer) => {
-  if (!sample?.active) return;
+  if (!sample) return;
   sources[sample.key] = loadAudioSource(buffer, 1.0);
 };
 

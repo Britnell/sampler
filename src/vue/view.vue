@@ -29,6 +29,7 @@ const dragSamplePos = (drag: number) => {
   if (!edit || !sample) return;
 
   const buffer = buffers.value[sample.bufferid];
+  if (!buffer) return;
   const pos = sample[edit] ?? 0;
   const dir = edit === "begin" ? -1 : 1;
 
@@ -39,10 +40,7 @@ const dragSamplePos = (drag: number) => {
 };
 </script>
 <template>
-  <section
-    class="view absolute inset-0 bg-[var(--bg)] p-4"
-    v-if="ui.sample?.active"
-  >
+  <section class="view absolute inset-0 bg-[var(--bg)] p-4" v-if="ui.sample">
     <div class="flex justify-between items-start">
       <h2 class="text-2xl border border-white w-16 h-16">
         {{ ui.sample.key }}

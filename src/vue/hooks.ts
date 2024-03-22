@@ -14,7 +14,6 @@ export type BufferState = { [name: string]: AudioBuffer | null };
 export type SampleT = {
   key: string;
   bufferid: string;
-  active: boolean;
   held: boolean;
   begin: number;
   end?: number | null;
@@ -68,13 +67,13 @@ export function useKeyboard(
     if (samplekeys.includes(key)) {
       if (ev.ctrlKey) return;
       const sample = samples.value[key];
-      if (!sample?.active || sample?.held) return;
+      if (!sample || sample?.held) return;
       playSample(sample);
 
       sample.held = true;
       // open in viz - if viz is empty
       const setAll = settings.value.openView === "always";
-      const setAuto = !ui.value.sample?.active && sample.active;
+      const setAuto = !ui.value.sample && sample;
       if (setAll || setAuto) ui.value.sample = sample;
       return;
     }
@@ -107,7 +106,7 @@ export function useKeyboard(
     }
 
     // close sample
-    if (ui.value.sample?.active) {
+    if (ui.value.sample) {
       if (key === "Escape") {
         ui.value.sample = null;
         ui.value.edit = null;
