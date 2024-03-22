@@ -22,16 +22,35 @@ export const setPassFilter = (type: "highpass" | "lowpass", f: number) => {
 
 //  DELAY
 
-const delayNode = audioContext.createDelay();
+let delayNode = audioContext.createDelay();
 delayNode.delayTime.value = 0.5;
-const feedbackGain = audioContext.createGain();
+let feedbackGain = audioContext.createGain();
 feedbackGain.gain.value = 0.5;
-const dryGain = audioContext.createGain();
+let dryGain = audioContext.createGain();
 dryGain.gain.value = 0.5;
-const wetGain = audioContext.createGain();
+let wetGain = audioContext.createGain();
 wetGain.gain.value = 0.5;
 
 let delayEnable = false;
+
+export const setDelay = ({
+  time,
+  feedback,
+  dry,
+  wet,
+}: {
+  time: number;
+  feedback: number;
+  dry: number;
+  wet: number;
+}) => {
+  delayNode.delayTime.value = time;
+  feedbackGain.gain.value = feedback;
+  dryGain.gain.value = dry;
+  wetGain.gain.value = wet;
+
+  //
+};
 
 export const enableDelay = (st: boolean) => (delayEnable = st);
 

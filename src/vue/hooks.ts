@@ -188,9 +188,9 @@ type Effect = {
   delay: {
     enabled: boolean;
     time: number;
-    // feedback?: number;
-    // dry?: number;
-    // wet?: number;
+    feedback: number;
+    dry: number;
+    wet: number;
   };
 };
 
@@ -203,5 +203,8 @@ export const refEffect = () =>
     delay: {
       enabled: true,
       time: 0.2,
+      feedback: 0.5,
+      dry: 0.5,
+      wet: 0.5,
     },
   });
