@@ -60,6 +60,10 @@ const keydown = (ev: KeyboardEvent) => {
     if (key === "Enter") {
       const id = ui.value.modal.value;
       if (!id) return;
+      // remove sample keys
+      Object.values(samples.value).map((sample) => {
+        if (sample?.bufferid === id) sample.active = false;
+      });
       buffers.value[id] = null;
       samplesDbRemove(id);
       closeModal();
