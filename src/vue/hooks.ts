@@ -185,6 +185,13 @@ type Effect = {
     type: "lowpass" | "highpass" | "none";
     freq: number;
   };
+  delay: {
+    enabled: boolean;
+    time: number;
+    // feedback?: number;
+    // dry?: number;
+    // wet?: number;
+  };
 };
 
 export const refEffect = () =>
@@ -192,5 +199,9 @@ export const refEffect = () =>
     filter: {
       type: "none",
       freq: 500,
+    },
+    delay: {
+      enabled: true,
+      time: 0.2,
     },
   });

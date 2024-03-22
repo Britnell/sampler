@@ -10,9 +10,9 @@ declare global {
 export const audioContext = new (window.AudioContext ||
   window.webkitAudioContext)();
 
-export let passFilter: null | BiquadFilterNode;
+export let passFilter: BiquadFilterNode;
 
-export const clearPassFilter = () => (passFilter = null);
+export const clearPassFilter = () => setPassFilter("highpass", 0);
 
 export const setPassFilter = (type: "highpass" | "lowpass", f: number) => {
   passFilter = audioContext.createBiquadFilter();
@@ -20,13 +20,35 @@ export const setPassFilter = (type: "highpass" | "lowpass", f: number) => {
   passFilter.frequency.value = f;
 };
 
+//  DELAY
+
+const delayNode = audioContext.createDelay();
+delayNode.delayTime.value = 0.5;
+const feedbackGain = audioContext.createGain();
+feedbackGain.gain.value = 0.5;
+const dryGain = audioContext.createGain();
+dryGain.gain.value = 0.5;
+const wetGain = audioContext.createGain();
+wetGain.gain.value = 0.5;
+
+let delayEnable = false;
+
+export const enableDelay = (st: boolean) => (delayEnable = st);
+
+const connectDelay = (source: AudioNode) => {
+  source.connect(delayNode);
+  delayNode.connect(wetGain);
+  delayNode.connect(feedbackGain);
+  feedbackGain.connect(delayNode);
+  source.connect(dryGain);
+  dryGain.connect(audioContext.destination);
+  wetGain.connect(audioContext.destination);
+};
+
 const outputFilteredSource = (source: AudioBufferSourceNode) => {
-  if (!passFilter) {
-    source.connect(audioContext.destination);
-  } else if (passFilter) {
-    source.connect(passFilter);
-    passFilter.connect(audioContext.destination);
-  }
+  source.connect(passFilter);
+  if (!delayEnable) passFilter.connect(audioContext.destination);
+  else connectDelay(source);
 };
 
 export const loadAudioSource = (

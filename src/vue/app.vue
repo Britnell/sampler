@@ -17,7 +17,7 @@ import Finder from "./find.vue";
 import Sequencer from "./sequencer.vue";
 import { onMounted, onUnmounted, watchEffect } from "vue";
 import { samplesDbRemove } from "./indexdb";
-import { clearPassFilter, setPassFilter } from "./audio";
+import { clearPassFilter, setPassFilter, enableDelay } from "./audio";
 
 const buffers = refBuffers();
 const samples = refSamples();
@@ -127,6 +127,13 @@ watchEffect(() => {
     setPassFilter(filter.type as "lowpass", filter.freq);
   } else clearPassFilter();
 });
+
+watchEffect(() => {
+  const delay = effect.value.delay;
+  enableDelay(delay.enabled);
+  // if (!delay.enabled) clearDelay();
+  // else setDelay(delay.time);
+});
 </script>
 <template>
   <header class="max-w-[1000px] mx-auto px-8">
@@ -193,7 +200,6 @@ watchEffect(() => {
             :value="effect.filter?.type"
             @input="
               effect.filter = {
-                freq: 500,
                 ...effect.filter,
                 type: ($event.target as HTMLInputElement).value as
                   | 'lowpass'
@@ -226,10 +232,53 @@ watchEffect(() => {
             step="10"
             :value="effect.filter?.freq"
             @input="
-              if (effect.filter)
-                effect.filter.freq = +($event.target as HTMLInputElement).value;
+              effect.filter.freq = +($event.target as HTMLInputElement).value
             "
           />
+        </div>
+
+        <h2>Delay</h2>
+        <div>
+          <label>
+            <input
+              type="checkbox"
+              :value="effect.delay?.enabled"
+              :checked="effect.delay?.enabled"
+              @input="
+                effect.delay = {
+                  ...effect.delay,
+                  enabled: ($event.target as HTMLInputElement).checked,
+                }
+              "
+            />
+            {{ effect.delay?.enabled ? "ON" : "OFF" }}
+          </label>
+          <div>
+            <label for=""> Delay : </label>
+            <input
+              type="number"
+              class="bg-transparent w-16"
+              :value="effect.delay?.time"
+              @input="
+                if (effect.delay)
+                  effect.delay.time = +($event.target as HTMLInputElement)
+                    .value;
+              "
+            />
+            <input
+              type="range"
+              class="w-[200px]"
+              min="0.001"
+              max="2"
+              step="0.001"
+              :value="effect.delay?.time"
+              @input="
+                if (effect.delay)
+                  effect.delay.time = +($event.target as HTMLInputElement)
+                    .value;
+              "
+            />
+          </div>
         </div>
       </div>
     </div>
