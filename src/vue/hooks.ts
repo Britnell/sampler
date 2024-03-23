@@ -10,6 +10,7 @@ import {
   loadSample,
   playSample,
   stopAllSamples,
+  stopMutegroup,
   stopSampleReload,
 } from "./audio";
 import { limit } from "./lib";
@@ -81,6 +82,7 @@ export function useKeyboard(
 
       const buffer = buffers.value[sample.bufferid];
       playSample(sample, buffer);
+      stopMutegroup(sample, samples.value, buffers.value);
 
       sample.pressed = true;
       // open in viz - if viz is empty

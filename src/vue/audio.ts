@@ -180,3 +180,19 @@ export const stopAllSamples = (samples: SamplesT, buffers: BufferState) => {
     stopSampleReload(sample, buffer);
   });
 };
+
+export const stopMutegroup = (
+  sample: SampleT,
+  samples: SamplesT,
+  buffers: BufferState
+) => {
+  if (!sample.mutegroup) return;
+
+  Object.values(samples).forEach((other) => {
+    if (!other) return;
+    if (sample.key === other.key) return;
+    if (sample.mutegroup !== other.mutegroup) return;
+    const buffer = buffers[other.bufferid];
+    stopSampleReload(other, buffer);
+  });
+};
