@@ -86,10 +86,7 @@ export function useKeyboard(
       stopMutegroup(sample, samples.value, buffers.value);
 
       sample.pressed = true;
-      // open in viz - if viz is empty
-      const setAll = settings.value.openView === "always";
-      const setAuto = !ui.value.sample && sample;
-      if (setAll || setAuto) ui.value.sample = sample;
+      ui.value.sample = sample;
       return;
     }
 
