@@ -6,7 +6,12 @@ import {
   type UnwrapRef,
   type Ref,
 } from "vue";
-import { loadSample, playSample, stopSample, stopSampleReload } from "./audio";
+import {
+  loadSample,
+  playSample,
+  stopAllSamples,
+  stopSampleReload,
+} from "./audio";
 import { limit } from "./lib";
 
 export type BufferState = { [name: string]: AudioBuffer | null };
@@ -108,6 +113,7 @@ export function useKeyboard(
       if (edit === "end" && next < sample.begin) next = sample.begin;
 
       sample[edit] = next;
+      ev.preventDefault();
     }
 
     // close sample
@@ -116,6 +122,11 @@ export function useKeyboard(
         ui.value.sample = null;
         ui.value.edit = null;
       }
+    }
+
+    if (key === " ") {
+      stopAllSamples(samples.value, buffers.value);
+      ev.preventDefault();
     }
   };
 

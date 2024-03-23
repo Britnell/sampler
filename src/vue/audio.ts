@@ -1,4 +1,4 @@
-import type { SampleT } from "./hooks";
+import type { BufferState, SampleT, SamplesT } from "./hooks";
 import { readFile } from "./lib";
 
 declare global {
@@ -173,4 +173,10 @@ export const stopSampleReload = (
   if (buffer) loadSample(sample, buffer);
 };
 
-export const stopAllSamples = () => {};
+export const stopAllSamples = (samples: SamplesT, buffers: BufferState) => {
+  Object.values(samples).forEach((sample) => {
+    if (!sample) return;
+    const buffer = buffers[sample.bufferid];
+    stopSampleReload(sample, buffer);
+  });
+};

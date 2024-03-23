@@ -12,6 +12,7 @@ import { type Ui, type BufferState, type SamplesT } from "./hooks";
 import { beep } from "./audio";
 import { cachedRef } from "./hooks";
 import { playSample, stopSample, stopSampleReload } from "./audio";
+import { stopAllSamples } from "./audio";
 
 const emit = defineEmits([""]);
 
@@ -147,9 +148,11 @@ const keyup = (ev: KeyboardEvent) => {
 };
 
 const cancel = () => {
-  if (intvl) clearInterval(intvl);
-  // stopAll()
+  // cancel seq tones
   [...cancelTones.values()].forEach((t) => clearTimeout(t));
+  // cancel seq timer
+  if (intvl) clearInterval(intvl);
+  stopAllSamples(samples.value, buffers.value);
 };
 
 onMounted(() => {
