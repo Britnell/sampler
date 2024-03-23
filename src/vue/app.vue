@@ -72,7 +72,7 @@ const keydown = (ev: KeyboardEvent) => {
       if (!id) return;
       // remove sample keys
       Object.values(samples.value).map((sample) => {
-        if (sample?.bufferid === id) sample = null;
+        if (sample?.bufferid === id) samples.value[sample.key] = null;
       });
       buffers.value[id] = null;
       samplesDbRemove(id);

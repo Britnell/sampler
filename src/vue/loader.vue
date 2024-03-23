@@ -12,10 +12,9 @@ onMounted(async () => {
   if (!ui || !buffers) return;
   // Load cache
   ui.value.loading = true;
-  const srcs = await loadCachedSamples();
-  // if (srcs) buffers.value = srcs;
-  if (srcs)
-    Object.entries(srcs).map(([name, buffer]) => {
+  const cachedBuffers = await loadCachedSamples();
+  if (cachedBuffers)
+    Object.entries(cachedBuffers).map(([name, buffer]) => {
       buffers.value[name] = buffer;
     });
   ui.value.loading = false;
