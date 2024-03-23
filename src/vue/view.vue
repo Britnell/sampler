@@ -81,7 +81,7 @@ const dragSamplePos = (drag: number) => {
             </button>
           </div>
         </div>
-        <p>hit SPACE to stop all samples</p>
+        <p>SPACE to stop all</p>
       </div>
     </div>
     <div class="relative">
