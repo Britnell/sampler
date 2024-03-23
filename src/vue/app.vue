@@ -15,7 +15,7 @@ import Keyboard from "./keyboard.vue";
 import View from "./view.vue";
 import Finder from "./find.vue";
 import Sequencer from "./sequencer.vue";
-import { onMounted, onUnmounted, watchEffect } from "vue";
+import { computed, onMounted, onUnmounted, watchEffect } from "vue";
 import { samplesDbRemove } from "./indexdb";
 import { clearPassFilter, setPassFilter, enableDelay } from "./audio";
 
@@ -112,6 +112,18 @@ const keydown = (ev: KeyboardEvent) => {
     }
     return;
   }
+
+  if (ui.value.modal?.type === "mutegroup") {
+    if (key === "Enter") closeModal();
+
+    const sample = samples.value[key];
+    if (!sample) return;
+    const group = ui.value.modal.value;
+    if (!group) return;
+    if (sample.mutegroup === group) sample.mutegroup = undefined;
+    else sample.mutegroup = group;
+    return;
+  }
 };
 
 onMounted(() => {
@@ -134,8 +146,15 @@ watchEffect(() => {
 watchEffect(() => {
   const delay = effect.value.delay;
   enableDelay(delay.enabled);
-  // if (!delay.enabled) clearDelay();
-  // else setDelay(delay.time);
+});
+
+const mutegroups = ["A", "B", "C", "D", "E"];
+
+const inModalMutegroup = computed(() => {
+  if (ui.value.modal?.type !== "mutegroup") return [];
+  return Object.values(samples.value)
+    .filter((s) => s?.mutegroup === ui.value.modal?.value)
+    .map((s) => s?.key);
 });
 </script>
 <template>
@@ -154,8 +173,8 @@ watchEffect(() => {
       </button>
     </div>
   </header>
-  <main class="min-h-[calc(100vh-4rem)] grid grid-rows-[1fr_auto]">
-    <div class="top w-full max-w-[1000px] mx-auto px-8">
+  <main class="min-h-[calc(100vh-8.5rem)] grid grid-rows-[1fr_auto]">
+    <div class="top w-full max-w-[1000px] mx-auto px-8 min-h-0 overflow-auto">
       <div v-if="tab === 'main'" class="view relative">
         <div class="x">
           <Loader :ui="ui" :buffers="buffers" />
@@ -165,24 +184,42 @@ watchEffect(() => {
             @assign="(key) => opanModal('assign', key)"
             @delete="(key) => opanModal('deletebuffer', key)"
           />
-          <section>
-            <h2 class="text-xl font-bold">settings</h2>
-            <div class="x">
-              <label>switch preview window</label>
-              {{ settings.openView }}
-              <select
-                class="bg-transparent ip primary"
-                x-model="settings.openView"
-              >
-                <option
-                  v-for="opt in ['always', 'auto']"
-                  :value="opt"
-                  class="text-black"
-                >
-                  {{ opt }}
-                </option>
-              </select>
+          <section class="p-6">
+            <h2 class="text-xl font-bold">Mute group</h2>
+
+            <div>
+              <ul class="flex gap-4">
+                <li v-for="key in mutegroups" :key="key">
+                  <button class="primary" @click="opanModal('mutegroup', key)">
+                    {{ key }}
+                  </button>
+                </li>
+              </ul>
             </div>
+          </section>
+          <section>
+            <details>
+              <summary>
+                <h2 class="inline-block text-xl font-bold">settings</h2>
+              </summary>
+
+              <div class="x">
+                <label>switch preview window</label>
+                {{ settings.openView }}
+                <select
+                  class="bg-transparent ip primary"
+                  x-model="settings.openView"
+                >
+                  <option
+                    v-for="opt in ['always', 'auto']"
+                    :value="opt"
+                    class="text-black"
+                  >
+                    {{ opt }}
+                  </option>
+                </select>
+              </div>
+            </details>
           </section>
           <Finder />
         </div>
@@ -303,6 +340,10 @@ watchEffect(() => {
         <p v-if="ui.modal?.type === 'deletebuffer'">
           Press ENTER to remove source
         </p>
+        <div v-if="ui.modal?.type === 'mutegroup'">
+          <p>Add / Remove keys from mutegroup {{ ui.modal.value }}</p>
+          <p>{{ inModalMutegroup.join(", ") }}</p>
+        </div>
       </Modal>
       <Modal :isOpen="ui.loading">
         <p>LOADING...</p>

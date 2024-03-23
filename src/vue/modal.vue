@@ -17,6 +17,11 @@ const onClose = () => {
 };
 </script>
 
+<style scoped>
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.2);
+}
+</style>
 <template>
   <dialog ref="el" @close="onClose">
     <slot></slot>

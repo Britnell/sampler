@@ -58,14 +58,15 @@ export function cachedRef<T>(key: string, initial: T): Ref<UnwrapRef<T>> {
   return state;
 }
 
+const samplekeys = "1234567890qwertyuiopasdfghjklzxcvbnm";
+export const isSampleKey = (key: string) => samplekeys.includes(key);
+
 export function useKeyboard(
   ui: Ref<Ui>,
   samples: Ref<SamplesT>,
   buffers: Ref<BufferState>,
   settings: Ref<Settings>
 ) {
-  const samplekeys = "1234567890qwertyuiopasdfghjklzxcvbnm";
-
   const keydown = (ev: KeyboardEvent) => {
     const { key } = ev;
 
@@ -73,7 +74,7 @@ export function useKeyboard(
     if (ui.value.modal) return;
 
     //  play sample
-    if (samplekeys.includes(key)) {
+    if (isSampleKey(key)) {
       if (ev.ctrlKey) return;
       const sample = samples.value[key];
       if (!sample || sample?.pressed) return;
