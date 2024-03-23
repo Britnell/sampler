@@ -38,7 +38,7 @@ useKeyboard(ui, samples, buffers, settings);
           v-for="k in row"
           class="flex-initial w-[min(5vw,64px)] h-[min(5vw,64px)] aspect-square border border-white p-2 box-content"
           :class="
-            samples[k]?.held
+            samples[k]?.pressed
               ? ' bg-blue-400 bg-opacity-50'
               : samples[k]
               ? ' bg-white bg-opacity-10 '

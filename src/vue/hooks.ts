@@ -14,7 +14,7 @@ export type BufferState = { [name: string]: AudioBuffer | null };
 export type SampleT = {
   key: string;
   bufferid: string;
-  held: boolean;
+  pressed: boolean;
   begin: number;
   end?: number | null;
 };
@@ -67,10 +67,10 @@ export function useKeyboard(
     if (samplekeys.includes(key)) {
       if (ev.ctrlKey) return;
       const sample = samples.value[key];
-      if (!sample || sample?.held) return;
+      if (!sample || sample?.pressed) return;
       playSample(sample);
 
-      sample.held = true;
+      sample.pressed = true;
       // open in viz - if viz is empty
       const setAll = settings.value.openView === "always";
       const setAuto = !ui.value.sample && sample;
@@ -122,7 +122,7 @@ export function useKeyboard(
     const buffer = buffers.value[sample.bufferid];
     if (!buffer) return;
     stopSampleReload(sample, buffer);
-    sample.held = false;
+    sample.pressed = false;
   };
 
   onMounted(() => {

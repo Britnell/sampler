@@ -53,7 +53,7 @@ const keydown = (ev: KeyboardEvent) => {
         key,
         begin: 0,
         bufferid: id,
-        held: false,
+        pressed: false,
       };
     closeModal();
     return;
