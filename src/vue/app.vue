@@ -126,15 +126,9 @@ const keydown = (ev: KeyboardEvent) => {
   }
 };
 
-onMounted(() => {
-  window.addEventListener("keydown", keydown);
-  // window.addEventListener("keyup", keyup);
-});
+onMounted(() => window.addEventListener("keydown", keydown));
 
-onUnmounted(() => {
-  window.removeEventListener("keydown", keydown);
-  // window.removeEventListener("keyup", keyup);
-});
+onUnmounted(() => window.removeEventListener("keydown", keydown));
 
 watchEffect(() => {
   const filter = effect.value.filter;

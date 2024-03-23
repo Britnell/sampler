@@ -111,18 +111,6 @@ export const loadArrayBuffer = async (arrayBuffer: ArrayBuffer) => {
   return buffer;
 };
 
-// export const loadBufferSource = (
-//   buffer: AudioBuffer | void,
-//   speed: number = 1.0
-// ) => {
-//   if (!buffer) return null;
-//   const source = audioContext.createBufferSource();
-//   source.buffer = buffer;
-//   source.playbackRate.value = speed;
-//   source.connect(audioContext.destination);
-//   return source;
-// };
-
 export const beep = (dur: number, f?: number) => {
   const beeper = audioContext.createOscillator();
   const gainNode = audioContext.createGain();

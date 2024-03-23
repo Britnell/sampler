@@ -59,7 +59,8 @@ export function cachedRef<T>(key: string, initial: T): Ref<UnwrapRef<T>> {
   return state;
 }
 
-const samplekeys = "1234567890qwertyuiopasdfghjklzxcvbnm";
+const samplekeys =
+  "1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
 export const isSampleKey = (key: string) => samplekeys.includes(key);
 
 export function useKeyboard(

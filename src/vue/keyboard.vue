@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, toRefs, defineEmits } from "vue";
+import { defineProps, toRefs, defineEmits, ref, onMounted } from "vue";
 import {
   useKeyboard,
   type Ui,
@@ -8,10 +8,6 @@ import {
   type Settings,
 } from "./hooks";
 
-const emit = defineEmits(["viewSample"]);
-
-const props = defineProps(["buffers", "ui", "samples", "settings"]);
-
 type Props = {
   ui: Ui;
   buffers: BufferState;
@@ -19,11 +15,21 @@ type Props = {
   settings: Settings;
 };
 
+const props = defineProps(["buffers", "ui", "samples", "settings"]);
+const { ui, buffers, samples, settings } = toRefs<Props>(props as Props);
+const shift = ref(false);
+const emit = defineEmits(["viewSample"]);
+
 const rows = ["1234567890", "qwertyuiop", "asdfghjkl", "zxcvbnm"];
 
-const { ui, buffers, samples, settings } = toRefs<Props>(props as Props);
-
 useKeyboard(ui, samples, buffers, settings);
+
+onMounted(() => {
+  const keydown = (ev: KeyboardEvent) => {
+    if (ev.key === "CapsLock") shift.value = !shift.value;
+  };
+  window.addEventListener("keydown", keydown);
+});
 </script>
 
 <template>
@@ -35,7 +41,7 @@ useKeyboard(ui, samples, buffers, settings);
         :style="'--x:' + i"
       >
         <button
-          v-for="k in row"
+          v-for="k in shift ? row.toUpperCase() : row"
           class="flex-initial w-[min(5vw,64px)] h-[min(5vw,64px)] aspect-square border border-white p-2 box-content"
           :class="
             samples[k]?.pressed
