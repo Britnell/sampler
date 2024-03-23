@@ -55,9 +55,9 @@ const dragSamplePos = (drag: number) => {
       </div>
       <button class="primary" @click="ui.sample = null">Close</button>
     </div>
-    <div class="mt-6 p-6">
+    <div class="my-6 p-6">
       <h3 class="text-lg font-bold">PLayback</h3>
-      <div>
+      <div class="flex justify-between">
         <label>
           <input
             type="checkbox"
@@ -70,7 +70,7 @@ const dragSamplePos = (drag: number) => {
         </label>
         <div class="x">
           <div class="flex gap-6 items-center">
-            <p>Mute group: {{ ui.sample.mutegroup ?? "none" }}</p>
+            <p>Mute group: {{ ui.sample.mutegroup ?? "_" }}</p>
             <button
               @click="
                 emit('openModal', 'mutegroup', ui.sample.mutegroup ?? 'A')
@@ -81,6 +81,7 @@ const dragSamplePos = (drag: number) => {
             </button>
           </div>
         </div>
+        <p>hit SPACE to stop all samples</p>
       </div>
     </div>
     <div class="relative">
@@ -90,79 +91,60 @@ const dragSamplePos = (drag: number) => {
         :ui="ui"
         @mouseDrag="dragSamplePos"
       />
-      <button
-        v-if="!ui.edit"
-        class="absolute top-0 bottom-0 left-0 right-[75%] bg-white bg-opacity-10 opacity-0 hover:opacity-100"
-        @click="ui.edit = 'begin'"
-      >
-        edit begin
-      </button>
-      <button
-        v-if="!ui.edit && !ui.sample.end"
-        class="absolute top-0 bottom-0 right-0 left-[75%] bg-white bg-opacity-10 opacity-0 hover:opacity-100"
-        @click="addEnd"
-      >
-        add end
-      </button>
-      <button
-        v-if="!ui.edit && ui.sample.end"
-        class="absolute top-0 bottom-0 right-0 left-[75%] bg-white bg-opacity-10 opacity-0 hover:opacity-100"
-        @click="ui.edit = 'end'"
-      >
-        edit end
-      </button>
-    </div>
-    <div class="flex justify-between">
-      <div class="flex flex-col gap-2">
+      <div>
         <button
-          class="primary bg-white text-black"
-          v-if="ui.edit === 'begin'"
+          v-if="ui.edit !== 'begin'"
+          class="absolute top-0 bottom-0 left-0 right-[75%] bg-white bg-opacity-10 opacity-0 hover:opacity-100"
+          @click="ui.edit = 'begin'"
+        >
+          edit begin
+        </button>
+        <button
+          class="absolute top-0 bottom-0 left-0 right-[75%] bg-white bg-opacity-10 opacity-0 hover:opacity-100"
+          v-else
           @click="ui.edit = null"
         >
           done
         </button>
-        <button class="primary" v-else @click="ui.edit = 'begin'">
-          Edit begin
-        </button>
-        <button class="primary" @click="emit('openModal', 'splice')">
-          splice
-        </button>
       </div>
       <div>
-        <p v-if="ui.edit">use arrow keys / drag w mouse</p>
+        <button
+          v-if="ui.edit === 'end'"
+          class="absolute top-0 bottom-0 right-0 left-[75%] bg-white bg-opacity-10 opacity-0 hover:opacity-100"
+          @click="ui.edit = null"
+        >
+          done
+        </button>
+        <button
+          v-else-if="!ui.edit && !ui.sample.end"
+          class="absolute top-0 bottom-0 right-0 left-[75%] bg-white bg-opacity-10 opacity-0 hover:opacity-100"
+          @click="addEnd"
+        >
+          add end
+        </button>
+        <button
+          v-else
+          class="absolute top-0 bottom-0 right-0 left-[75%] bg-white bg-opacity-10 opacity-0 hover:opacity-100"
+          @click="ui.edit = 'end'"
+        >
+          edit end
+        </button>
       </div>
+    </div>
+    <div class="flex justify-between px-6 py-2">
+      <button class="primary" @click="emit('openModal', 'splice')">
+        splice
+      </button>
       <div>
-        <div class="flex flex-col gap-2">
-          <div>
-            <button
-              class="primary"
-              v-if="ui.sample.end === null"
-              @click="addEnd"
-            >
-              add end
-            </button>
-            <button
-              class="primary bg-white text-black"
-              v-else-if="ui.edit === 'end'"
-              @click="ui.edit = null"
-            >
-              done
-            </button>
-            <button v-else class="primary" @click="ui.edit = 'end'">
-              Edit End
-            </button>
-          </div>
-          <div>
-            <button
-              class="primary"
-              :class="ui.sample.end !== null ? '' : ' invisible'"
-              @click="ui.sample.end = null"
-            >
-              Remove end
-            </button>
-          </div>
-        </div>
+        <p v-if="ui.edit">EDITIING - use arrow keys / drag w mouse</p>
       </div>
+      <button
+        class="primary"
+        :class="ui.sample.end !== null ? '' : ' invisible'"
+        @click="ui.sample.end = null"
+      >
+        Remove end
+      </button>
     </div>
     <div class="p-6">
       <p>Move sample:</p>

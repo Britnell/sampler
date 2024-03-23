@@ -54,9 +54,10 @@ const keydown = (ev: KeyboardEvent) => {
     samples.value[key] = {
       key,
       begin: 0,
-      hold: false,
+      hold: true,
       bufferid: id,
       pressed: false,
+      mutegroup: undefined,
     };
     closeModal();
     return;
@@ -157,7 +158,7 @@ const inModalMutegroup = computed(() => {
     <div class=" ">
       <h1 class="text-2xl font-bold py-4">Audio Sampler</h1>
     </div>
-    <div class="flex gap-4 mb-8 border-b border-white">
+    <div class="flex gap-4 border-b border-white">
       <button
         v-for="t in (['main', 'sequencer','filter'] as const)"
         class="border border-white px-2 py-1"
@@ -180,12 +181,14 @@ const inModalMutegroup = computed(() => {
             @delete="(key) => opanModal('deletebuffer', key)"
           />
           <section class="p-6">
-            <h2 class="text-xl font-bold">Mute group</h2>
-
+            <h2 class="text-xl font-bold">Mute groups</h2>
             <div>
               <ul class="flex gap-4">
                 <li v-for="key in mutegroups" :key="key">
-                  <button class="primary" @click="opanModal('mutegroup', key)">
+                  <button
+                    class="primary px-3"
+                    @click="opanModal('mutegroup', key)"
+                  >
                     {{ key }}
                   </button>
                 </li>
