@@ -49,7 +49,18 @@ const dragSamplePos = (drag: number) => {
       <button class="primary" @click="ui.sample = null">Close</button>
     </div>
     <div class="my-4 flex justify-between">
-      <div></div>
+      <div>
+        <label>
+          <input
+            type="checkbox"
+            name="hold"
+            id="hold"
+            v-model="ui.sample.hold"
+          />
+          hold :
+          {{ ui.sample.hold ? " ON " : "OFF" }}
+        </label>
+      </div>
       <p>
         [ {{ ui.sample.begin.toFixed(2) }}
         <span v-if="ui.sample.end"> - {{ ui.sample.end?.toFixed(2) }} </span>
@@ -87,7 +98,7 @@ const dragSamplePos = (drag: number) => {
       </button>
     </div>
     <div class="flex justify-between">
-      <div>
+      <div class="flex flex-col gap-2">
         <button
           class="primary bg-white text-black"
           v-if="ui.edit === 'begin'"
@@ -97,6 +108,9 @@ const dragSamplePos = (drag: number) => {
         </button>
         <button class="primary" v-else @click="ui.edit = 'begin'">
           Edit begin
+        </button>
+        <button class="primary" @click="emit('openModal', 'splice')">
+          splice
         </button>
       </div>
       <div>
@@ -135,18 +149,15 @@ const dragSamplePos = (drag: number) => {
         </div>
       </div>
     </div>
-    <div class="x">
+    <div class="p-6">
       <p>Move sample:</p>
       <div class="flex gap-4">
         <button class="primary" @click="emit('openModal', 'remove')">
           remove
         </button>
         <button class="primary" @click="emit('openModal', 'move')">move</button>
-        <button class="primary" xclick="emit('openModal', 'move')">swap</button>
+        <!-- <button class="primary" xclick="emit('openModal', 'move')">swap</button> -->
         <button class="primary" @click="emit('openModal', 'copy')">copy</button>
-        <button class="primary" @click="emit('openModal', 'splice')">
-          splice
-        </button>
       </div>
     </div>
   </section>
