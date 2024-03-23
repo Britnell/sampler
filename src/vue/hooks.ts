@@ -202,7 +202,7 @@ export const refSettings = () =>
 type Tabs = "main" | "view" | "sequencer" | "filter" | null;
 export const refTab = (initial: Tabs) => ref<Tabs>(initial);
 
-type Effect = {
+export type Effect = {
   filter: {
     type: "lowpass" | "highpass" | "none";
     freq: number;

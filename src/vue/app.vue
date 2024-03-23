@@ -1,4 +1,14 @@
 <script setup lang="ts">
+import Modal from "./modal.vue";
+import Assign from "./assign.vue";
+import Loader from "./loader.vue";
+import Keyboard from "./keyboard.vue";
+import View from "./view.vue";
+import Finder from "./find.vue";
+import Sequencer from "./sequencer.vue";
+import Effects from "./effects.vue";
+
+import { computed, onMounted, onUnmounted, watchEffect } from "vue";
 import {
   type SampleT,
   refSamples,
@@ -8,14 +18,6 @@ import {
   refTab,
   refEffect,
 } from "./hooks";
-import Modal from "./modal.vue";
-import Assign from "./assign.vue";
-import Loader from "./loader.vue";
-import Keyboard from "./keyboard.vue";
-import View from "./view.vue";
-import Finder from "./find.vue";
-import Sequencer from "./sequencer.vue";
-import { computed, onMounted, onUnmounted, watchEffect } from "vue";
 import { samplesDbRemove } from "./indexdb";
 import { clearPassFilter, setPassFilter, enableDelay } from "./audio";
 
@@ -169,7 +171,7 @@ const inModalMutegroup = computed(() => {
       </button>
     </div>
   </header>
-  <main class="min-h-[calc(100vh-8.5rem)] grid grid-rows-[1fr_auto]">
+  <main class="mt-4 min-h-[calc(100vh-8.5rem)] grid grid-rows-[1fr_auto]">
     <div class="top w-full max-w-[1000px] mx-auto px-8 min-h-0 overflow-auto">
       <div v-if="tab === 'main'" class="view relative">
         <div class="x">
@@ -195,7 +197,7 @@ const inModalMutegroup = computed(() => {
               </ul>
             </div>
           </section>
-          <section>
+          <!-- <section>
             <details>
               <summary>
                 <h2 class="inline-block text-xl font-bold">settings</h2>
@@ -218,7 +220,7 @@ const inModalMutegroup = computed(() => {
                 </select>
               </div>
             </details>
-          </section>
+          </section> -->
           <Finder />
         </div>
         <View
@@ -232,92 +234,7 @@ const inModalMutegroup = computed(() => {
         <Sequencer :ui="ui" :buffers="buffers" :samples="samples" />
       </div>
       <div v-if="tab === 'filter'" class="filter">
-        <h2>High- / Low-pass</h2>
-        <div>
-          <select
-            :value="effect.filter?.type"
-            @input="
-              effect.filter = {
-                ...effect.filter,
-                type: ($event.target as HTMLInputElement).value as
-                  | 'lowpass'
-                  | 'highpass',
-              }
-            "
-            class="bg-transparent ip primary"
-          >
-            <option class="text-black" value="none">none</option>
-            <option class="text-black" value="lowpass">lowpass</option>
-            <option class="text-black" value="highpass">highpass</option>
-          </select>
-        </div>
-        <div>
-          <label for=""> Freq : </label>
-          <input
-            type="number"
-            class="bg-transparent w-16"
-            :value="effect.filter?.freq"
-            @input="
-              if (effect.filter)
-                effect.filter.freq = +($event.target as HTMLInputElement).value;
-            "
-          />
-          <input
-            type="range"
-            class="w-[200px]"
-            min="20"
-            max="20000"
-            step="10"
-            :value="effect.filter?.freq"
-            @input="
-              effect.filter.freq = +($event.target as HTMLInputElement).value
-            "
-          />
-        </div>
-
-        <h2>Delay</h2>
-        <div>
-          <label>
-            <input
-              type="checkbox"
-              :value="effect.delay?.enabled"
-              :checked="effect.delay?.enabled"
-              @input="
-                effect.delay = {
-                  ...effect.delay,
-                  enabled: ($event.target as HTMLInputElement).checked,
-                }
-              "
-            />
-            {{ effect.delay?.enabled ? "ON" : "OFF" }}
-          </label>
-          <div>
-            <label for=""> Delay : </label>
-            <input
-              type="number"
-              class="bg-transparent w-16"
-              :value="effect.delay?.time"
-              @input="
-                if (effect.delay)
-                  effect.delay.time = +($event.target as HTMLInputElement)
-                    .value;
-              "
-            />
-            <input
-              type="range"
-              class="w-[200px]"
-              min="0.001"
-              max="2"
-              step="0.001"
-              :value="effect.delay?.time"
-              @input="
-                if (effect.delay)
-                  effect.delay.time = +($event.target as HTMLInputElement)
-                    .value;
-              "
-            />
-          </div>
-        </div>
+        <Effects :effect="effect" />
       </div>
     </div>
 

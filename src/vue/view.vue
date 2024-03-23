@@ -136,7 +136,7 @@ const dragSamplePos = (drag: number) => {
         splice
       </button>
       <div>
-        <p v-if="ui.edit">EDITIING - use arrow keys / drag w mouse</p>
+        <p v-if="ui.edit">EDITING - use arrow keys / drag w mouse</p>
       </div>
       <button
         class="primary"
