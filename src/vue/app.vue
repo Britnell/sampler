@@ -99,6 +99,7 @@ const keydown = (ev: KeyboardEvent) => {
   if (ui.value.modal.type === "remove") {
     if (key === ui.value.sample?.key) {
       samples.value[key] = null;
+      ui.value.sample = null;
       closeModal();
     }
     return;
