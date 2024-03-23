@@ -74,7 +74,7 @@ const onSpeed = (val: string) => {
             ]
           </p>
           <div class="flex gap-4">
-            <label class=" ">Speed: </label>
+            <label class=" ">Speed: x</label>
             <input
               type="number"
               :value="speeds[ui.sample.bufferid] ?? 1.0"

@@ -17,6 +17,7 @@ import {
   refSettings,
   refTab,
   refEffect,
+  isSampleKey,
 } from "./hooks";
 import { samplesDbRemove } from "./indexdb";
 import { clearPassFilter, setPassFilter, enableDelay } from "./audio";
@@ -80,6 +81,7 @@ const keydown = (ev: KeyboardEvent) => {
     return;
   }
   if (ui.value.modal?.type === "copy") {
+    if (!isSampleKey(key)) return;
     if (ui.value.sample && !samples.value[key]) {
       samples.value[key] = { ...ui.value.sample, key };
       closeModal();
@@ -88,6 +90,7 @@ const keydown = (ev: KeyboardEvent) => {
     return;
   }
   if (ui.value.modal?.type === "move") {
+    if (!isSampleKey(key)) return;
     if (ui.value.sample && !samples.value[key]) {
       samples.value[key] = { ...ui.value.sample, key };
       samples.value[ui.value.sample.key] = null;
@@ -105,6 +108,7 @@ const keydown = (ev: KeyboardEvent) => {
     return;
   }
   if (ui.value.modal?.type === "splice") {
+    if (!isSampleKey(key)) return;
     if (ui.value.sample && !samples.value[key]) {
       const copy = { ...ui.value.sample, key };
       if (copy.end) {
@@ -120,6 +124,8 @@ const keydown = (ev: KeyboardEvent) => {
 
   if (ui.value.modal?.type === "mutegroup") {
     if (key === "Enter") closeModal();
+
+    // if(!isSampleKey(key)) return;
 
     const sample = samples.value[key];
     if (!sample) return;
