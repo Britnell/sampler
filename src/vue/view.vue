@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, toRefs, defineEmits } from "vue";
+import { defineProps, toRefs, defineEmits, computed } from "vue";
 import { type Ui, type BufferState, type SamplesT } from "./hooks";
 import Sampleviz from "./samplewave.vue";
 import { limit } from "./lib";
@@ -14,7 +14,7 @@ type Props = {
   samples: SamplesT;
 };
 
-const { ui, buffers } = toRefs<Props>(props as Props);
+const { ui, buffers, samples } = toRefs<Props>(props as Props);
 
 const addEnd = () => {
   if (!ui.value.sample) return;
@@ -38,6 +38,24 @@ const dragSamplePos = (drag: number) => {
   if (edit === "end" && next < sample.begin) next = sample.begin;
   sample[edit] = next;
 };
+
+const speeds = computed(() => {
+  const spds: { [id: string]: number } = {};
+  Object.values(samples.value).forEach((sample) => {
+    if (!sample) return;
+    spds[sample.bufferid] = sample.speed;
+  });
+  return spds;
+});
+
+const onSpeed = (val: string) => {
+  // sync speed across all samples from this buffer
+  Object.values(samples.value).forEach((sample) => {
+    if (!sample) return;
+    if (sample.bufferid !== ui.value.sample?.bufferid) return;
+    sample.speed = +val;
+  });
+};
 </script>
 <template>
   <section class="view absolute inset-0 bg-[var(--bg)] p-4" v-if="ui.sample">
@@ -47,11 +65,35 @@ const dragSamplePos = (drag: number) => {
       </h2>
       <div class="">
         <p>{{ ui.sample?.bufferid }}</p>
-        <p class="">
-          [ {{ ui.sample.begin.toFixed(2) }}s
-          <span v-if="ui.sample.end"> - {{ ui.sample.end?.toFixed(2) }}s </span>
-          ]
-        </p>
+        <div class="x">
+          <p class="">
+            [ {{ ui.sample.begin.toFixed(2) }}s
+            <span v-if="ui.sample.end">
+              - {{ ui.sample.end?.toFixed(2) }}s
+            </span>
+            ]
+          </p>
+          <div class="flex gap-4">
+            <label class=" ">Speed: </label>
+            <input
+              type="number"
+              :value="speeds[ui.sample.bufferid] ?? 1.0"
+              @input="(ev) => onSpeed((ev.target as HTMLInputElement).value)"
+              class="w-[80px] bg-transparent"
+              step="0.01"
+            />
+
+            <input
+              type="range"
+              name="speed"
+              min="0.5"
+              max="2"
+              step="0.01"
+              :value="speeds[ui.sample.bufferid] ?? 1.0"
+              @input="(ev) => onSpeed((ev.target as HTMLInputElement).value)"
+            />
+          </div>
+        </div>
       </div>
       <button class="primary" @click="ui.sample = null">Close</button>
     </div>

@@ -70,10 +70,7 @@ const outputFilteredSource = (source: AudioBufferSourceNode) => {
   else connectDelay(source);
 };
 
-export const loadAudioSource = (
-  buffer: AudioBuffer | void,
-  speed: number = 1.0
-) => {
+export const loadAudioSource = (buffer: AudioBuffer | void, speed: number) => {
   if (!buffer) return null;
   const source = audioContext.createBufferSource();
   source.buffer = buffer;
@@ -149,8 +146,7 @@ export const stopSample = (sample: SampleT) => {
 };
 
 export const loadSample = (sample: SampleT, buffer: AudioBuffer) => {
-  if (!sample) return;
-  sources[sample.key] = loadAudioSource(buffer, 1.0);
+  sources[sample.key] = loadAudioSource(buffer, sample.speed);
 };
 
 export const stopSampleReload = (

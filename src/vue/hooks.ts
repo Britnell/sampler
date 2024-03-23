@@ -7,7 +7,6 @@ import {
   type Ref,
 } from "vue";
 import {
-  loadSample,
   playSample,
   stopAllSamples,
   stopMutegroup,
@@ -25,6 +24,7 @@ export type SampleT = {
   end?: number | null;
   hold: boolean;
   mutegroup?: string;
+  speed: number;
 };
 
 export type SamplesT = {
@@ -160,7 +160,7 @@ export function useKeyboard(
       if (!sample) return;
       const buffer = buffers.value[sample.bufferid];
       if (!buffer) return;
-      loadSample(sample, buffer);
+      stopSampleReload(sample, buffer);
     });
   });
 }

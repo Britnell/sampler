@@ -18,10 +18,7 @@ const { buffers } = toRefs<Props>(props as Props);
         <div>
           {{ key }}
         </div>
-        <div class="flex gap-4">
-          <label>Speed: x2</label>
-          <input type="range" name="speed" min="0.5" max="2" step="0.1" />
-        </div>
+
         <div class="flex gap-3">
           <button @click="() => emit('delete', key)" class="primary py-0">
             delete

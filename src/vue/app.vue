@@ -58,6 +58,7 @@ const keydown = (ev: KeyboardEvent) => {
       begin: 0,
       hold: true,
       bufferid: id,
+      speed: 1.0,
       pressed: false,
       mutegroup: undefined,
     };
