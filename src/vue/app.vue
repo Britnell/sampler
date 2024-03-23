@@ -20,7 +20,12 @@ import {
   isSampleKey,
 } from "./hooks";
 import { samplesDbRemove } from "./indexdb";
-import { clearPassFilter, setPassFilter, enableDelay } from "./audio";
+import {
+  clearPassFilter,
+  setPassFilter,
+  enableDelay,
+  stopSample,
+} from "./audio";
 
 const buffers = refBuffers();
 const samples = refSamples();
@@ -92,6 +97,7 @@ const keydown = (ev: KeyboardEvent) => {
   if (ui.value.modal?.type === "move") {
     if (!isSampleKey(key)) return;
     if (ui.value.sample && !samples.value[key]) {
+      stopSample(ui.value.sample);
       samples.value[key] = { ...ui.value.sample, key };
       samples.value[ui.value.sample.key] = null;
       closeModal();
@@ -101,6 +107,7 @@ const keydown = (ev: KeyboardEvent) => {
   }
   if (ui.value.modal.type === "remove") {
     if (key === ui.value.sample?.key) {
+      stopSample(ui.value.sample);
       samples.value[key] = null;
       ui.value.sample = null;
       closeModal();
