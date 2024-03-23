@@ -6,7 +6,7 @@ export const listCollections = () => {
   const list: any[] = [];
   $("#collection-select")
     .children()
-    .each((x, el) => {
+    .each((_, el) => {
       const li = $(el).find("a");
       const href = li.attr("href");
       const name = li.text();
@@ -20,7 +20,7 @@ export const getPageFiles = (html: string) => {
   const list: object[] = [];
   $("ul.preview-list")
     .children()
-    .each((x, el) => {
+    .each((_, el) => {
       //   if (x > 10) return;
       const li = $(el);
       const href = li.find("a:contains('details')").attr("href");

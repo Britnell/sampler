@@ -8,7 +8,7 @@ const loclabs = "https://citizen-dj.labs.loc.gov";
 
 declare var Bun: any;
 
-const getPage = async (x: number) => {
+export const getPage = async (x: number) => {
   const url = loclabs + collections[x].href;
   const page = await fetch(url).then((res) => res.text());
   const files = getPageFiles(page);
@@ -22,7 +22,7 @@ const getPage = async (x: number) => {
 //   await delay(2000);
 // }
 
-function delay(x: number) {
+export function delay(x: number) {
   return new Promise((resolve) => {
     setTimeout(() => resolve(null), x);
   });
