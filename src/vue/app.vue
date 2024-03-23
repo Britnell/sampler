@@ -197,30 +197,6 @@ const inModalMutegroup = computed(() => {
               </ul>
             </div>
           </section>
-          <!-- <section>
-            <details>
-              <summary>
-                <h2 class="inline-block text-xl font-bold">settings</h2>
-              </summary>
-
-              <div class="x">
-                <label>switch preview window</label>
-                {{ settings.openView }}
-                <select
-                  class="bg-transparent ip primary"
-                  x-model="settings.openView"
-                >
-                  <option
-                    v-for="opt in ['always', 'auto']"
-                    :value="opt"
-                    class="text-black"
-                  >
-                    {{ opt }}
-                  </option>
-                </select>
-              </div>
-            </details>
-          </section> -->
           <Finder />
         </div>
         <View
