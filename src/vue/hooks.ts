@@ -6,7 +6,7 @@ import {
   type UnwrapRef,
   type Ref,
 } from "vue";
-import { loadSample, playSample, stopSampleReload } from "./audio";
+import { loadSample, playSample, stopSample, stopSampleReload } from "./audio";
 import { limit } from "./lib";
 
 export type BufferState = { [name: string]: AudioBuffer | null };
@@ -15,12 +15,15 @@ export type SampleT = {
   key: string;
   bufferid: string;
   pressed: boolean;
+  hold: boolean;
   begin: number;
   end?: number | null;
 };
+
 export type SamplesT = {
   [id: string]: SampleT | null;
 };
+
 export type Ui = {
   sample: SampleT | null;
   modal: { type: string; value?: string } | null;
@@ -68,7 +71,9 @@ export function useKeyboard(
       if (ev.ctrlKey) return;
       const sample = samples.value[key];
       if (!sample || sample?.pressed) return;
-      playSample(sample);
+
+      const buffer = buffers.value[sample.bufferid];
+      playSample(sample, buffer);
 
       sample.pressed = true;
       // open in viz - if viz is empty
@@ -119,9 +124,10 @@ export function useKeyboard(
     // clear & reload
     const sample = samples.value[key];
     if (!sample) return;
-    const buffer = buffers.value[sample.bufferid];
-    if (!buffer) return;
-    stopSampleReload(sample, buffer);
+    if (!sample.hold) {
+      const buffer = buffers.value[sample.bufferid];
+      stopSampleReload(sample, buffer);
+    }
     sample.pressed = false;
   };
 

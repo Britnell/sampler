@@ -48,13 +48,16 @@ const keydown = (ev: KeyboardEvent) => {
 
   if (ui.value.modal?.type === "assign") {
     const id = ui.value.modal.value;
-    if (id)
-      samples.value[key] = {
-        key,
-        begin: 0,
-        bufferid: id,
-        pressed: false,
-      };
+    if (!id) return;
+    const buffer = buffers.value[id];
+    if (!buffer) return;
+    samples.value[key] = {
+      key,
+      begin: 0,
+      hold: false,
+      bufferid: id,
+      pressed: false,
+    };
     closeModal();
     return;
   }

@@ -140,7 +140,10 @@ type Source = { [id: string]: AudioBufferSourceNode | null };
 
 const sources: Source = {};
 
-export const playSample = (sample: SampleT) => {
+export const playSample = (sample: SampleT, buffer: AudioBuffer | null) => {
+  // a 'hold' sample might be playing
+  if (sample.hold) stopSampleReload(sample, buffer);
+
   const dur = sample.end ? sample.end - sample.begin : undefined;
   try {
     sources[sample.key]?.start(audioContext.currentTime, sample.begin, dur);
@@ -162,9 +165,12 @@ export const loadSample = (sample: SampleT, buffer: AudioBuffer) => {
   sources[sample.key] = loadAudioSource(buffer, 1.0);
 };
 
-export const stopSampleReload = (sample: SampleT, buffer: AudioBuffer) => {
+export const stopSampleReload = (
+  sample: SampleT,
+  buffer: AudioBuffer | null
+) => {
   stopSample(sample);
-  loadSample(sample, buffer);
+  if (buffer) loadSample(sample, buffer);
 };
 
 export const stopAllSamples = () => {};

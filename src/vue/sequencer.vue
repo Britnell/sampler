@@ -83,12 +83,12 @@ const startSequencer = () => {
       const t = setTimeout(() => {
         const sample = samples.value[seq.key];
         if (!sample) return;
+        const buffer = buffers.value[sample.bufferid];
         if (seq.dir === "down") {
-          playSample(sample);
+          playSample(sample, buffer);
         }
         if (seq.dir === "up") {
-          const buffer = buffers.value[sample.bufferid];
-          if (buffer) stopSampleReload(sample, buffer);
+          stopSampleReload(sample, buffer);
         }
       }, tbar * seq.b);
       cancelTones.set(seq, t);
