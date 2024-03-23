@@ -55,8 +55,8 @@ const dragSamplePos = (drag: number) => {
       </div>
       <button class="primary" @click="ui.sample = null">Close</button>
     </div>
-    <div class="mt-6">
-      <h3>PLayback</h3>
+    <div class="mt-6 p-6">
+      <h3 class="text-lg font-bold">PLayback</h3>
       <div>
         <label>
           <input
@@ -69,7 +69,17 @@ const dragSamplePos = (drag: number) => {
           {{ ui.sample.hold ? " ON " : "OFF" }}
         </label>
         <div class="x">
-          <p>Mute group: {{ ui.sample.mutegroup }}</p>
+          <div class="flex gap-6 items-center">
+            <p>Mute group: {{ ui.sample.mutegroup ?? "none" }}</p>
+            <button
+              @click="
+                emit('openModal', 'mutegroup', ui.sample.mutegroup ?? 'A')
+              "
+              class="primary text-sm"
+            >
+              edit group {{ ui.sample.mutegroup ?? "A" }}
+            </button>
+          </div>
         </div>
       </div>
     </div>

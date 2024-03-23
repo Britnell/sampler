@@ -152,8 +152,9 @@ const mutegroups = ["A", "B", "C", "D", "E"];
 
 const inModalMutegroup = computed(() => {
   if (ui.value.modal?.type !== "mutegroup") return [];
+  const group = ui.value.modal?.value;
   return Object.values(samples.value)
-    .filter((s) => s?.mutegroup === ui.value.modal?.value)
+    .filter((s) => s?.mutegroup === group)
     .map((s) => s?.key);
 });
 </script>
