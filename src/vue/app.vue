@@ -170,7 +170,7 @@ const inModalMutegroup = computed(() => {
     </div>
     <div class="flex gap-4 border-b border-white">
       <button
-        v-for="t in (['main', 'sequencer','filter'] as const)"
+        v-for="t in (['main','filter','sequencer'] as const)"
         class="border border-white px-2 py-1"
         :class="t === tab ? ' bg-white text-black ' : ''"
         @click="tab = t"

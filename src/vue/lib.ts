@@ -1,5 +1,5 @@
-import type { BufferState } from "../react/loader";
 import { loadBlobBuffer } from "./audio";
+import type { BufferState } from "./hooks";
 import { samplesDbReadAll } from "./indexdb";
 
 export async function loadCachedSamples() {

@@ -16,13 +16,13 @@ type Props = {
 };
 
 const props = defineProps(["buffers", "ui", "samples", "settings"]);
-const { ui, buffers, samples, settings } = toRefs<Props>(props as Props);
+const { ui, buffers, samples } = toRefs<Props>(props as Props);
 const shift = ref(false);
 const emit = defineEmits(["viewSample"]);
 
 const rows = ["1234567890", "qwertyuiop", "asdfghjkl", "zxcvbnm"];
 
-useKeyboard(ui, samples, buffers, settings);
+useKeyboard(ui, samples, buffers);
 
 onMounted(() => {
   const keydown = (ev: KeyboardEvent) => {

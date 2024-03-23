@@ -66,8 +66,8 @@ export const isSampleKey = (key: string) => samplekeys.includes(key);
 export function useKeyboard(
   ui: Ref<Ui>,
   samples: Ref<SamplesT>,
-  buffers: Ref<BufferState>,
-  settings: Ref<Settings>
+  buffers: Ref<BufferState>
+  // settings: Ref<Settings>
 ) {
   const keydown = (ev: KeyboardEvent) => {
     const { key } = ev;
