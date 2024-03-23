@@ -41,14 +41,22 @@ const dragSamplePos = (drag: number) => {
 </script>
 <template>
   <section class="view absolute inset-0 bg-[var(--bg)] p-4" v-if="ui.sample">
-    <div class="flex justify-between items-start">
+    <div class="flex justify-between items-start gap-4">
       <h2 class="text-2xl border border-white w-16 h-16">
         {{ ui.sample.key }}
       </h2>
-      <p>{{ ui.sample?.bufferid }}</p>
+      <div class="">
+        <p>{{ ui.sample?.bufferid }}</p>
+        <p class="">
+          [ {{ ui.sample.begin.toFixed(2) }}s
+          <span v-if="ui.sample.end"> - {{ ui.sample.end?.toFixed(2) }}s </span>
+          ]
+        </p>
+      </div>
       <button class="primary" @click="ui.sample = null">Close</button>
     </div>
-    <div class="my-4 flex justify-between">
+    <div class="mt-6">
+      <h3>PLayback</h3>
       <div>
         <label>
           <input
@@ -60,13 +68,10 @@ const dragSamplePos = (drag: number) => {
           hold :
           {{ ui.sample.hold ? " ON " : "OFF" }}
         </label>
+        <div class="x">
+          <p>Mute group: {{ ui.sample.mutegroup }}</p>
+        </div>
       </div>
-      <p>
-        [ {{ ui.sample.begin.toFixed(2) }}
-        <span v-if="ui.sample.end"> - {{ ui.sample.end?.toFixed(2) }} </span>
-        ]
-      </p>
-      <span></span>
     </div>
     <div class="relative">
       <Sampleviz

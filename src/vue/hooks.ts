@@ -20,9 +20,10 @@ export type SampleT = {
   key: string;
   bufferid: string;
   pressed: boolean;
-  hold: boolean;
   begin: number;
   end?: number | null;
+  hold: boolean;
+  mutegroup?: string;
 };
 
 export type SamplesT = {
