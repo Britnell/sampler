@@ -137,6 +137,29 @@ export const playSample = (sample: SampleT, buffer: AudioBuffer | null) => {
   }
 };
 
+export const playHarmonic = (
+  sample: SampleT,
+  buffer: AudioBuffer | null,
+  pitch: number,
+  key: string
+) => {
+  if (!buffer) return null;
+  const speed = Math.pow(2, pitch / 12);
+  sources[`h-${key}`] = loadAudioSource(buffer, speed);
+
+  // play
+  const dur = sample.end ? sample.end - sample.begin : undefined;
+  try {
+    sources[`h-${key}`]?.start(audioContext.currentTime, sample.begin, dur);
+  } catch (e) {}
+};
+
+export const stopHarmonic = (key: string) => {
+  try {
+    sources[`h-${key}`]?.stop();
+  } catch (e) {}
+};
+
 export const stopSample = (sample: SampleT | string) => {
   try {
     if (typeof sample === "string") sources[sample]?.stop();

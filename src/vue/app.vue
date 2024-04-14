@@ -7,15 +7,15 @@ import View from "./view.vue";
 import Finder from "./find.vue";
 import Sequencer from "./sequencer.vue";
 import Effects from "./effects.vue";
+import Harmonic from "./harmonic.vue";
 
-import { computed, onMounted, onUnmounted, watchEffect } from "vue";
+import { computed, onMounted, onUnmounted, watchEffect, ref } from "vue";
 import {
   type SampleT,
   refSamples,
   refBuffers,
   refUi,
   refSettings,
-  refTab,
   refEffect,
   isSampleKey,
   tabs,
@@ -32,8 +32,8 @@ const buffers = refBuffers();
 const samples = refSamples();
 const ui = refUi();
 const settings = refSettings();
-const tab = refTab("main");
 const effect = refEffect();
+const harmonic = ref<string | null>(null);
 
 const opanModal = (type: string, value?: string) => {
   ui.value.modal = {
@@ -205,8 +205,8 @@ const inModalMutegroup = computed(() => {
       <button
         v-for="t in tabs"
         class="border border-white px-2 py-1"
-        :class="t === tab ? ' bg-white text-black ' : ''"
-        @click="tab = t"
+        :class="t === ui.tab ? ' bg-white text-black ' : ''"
+        @click="ui.tab = t"
       >
         {{ t }}
       </button>
@@ -214,7 +214,7 @@ const inModalMutegroup = computed(() => {
   </header>
   <main class="mt-4 min-h-[calc(100vh-8.5rem)] grid grid-rows-[1fr_auto]">
     <div class="top w-full max-w-[1000px] mx-auto px-8 min-h-0 overflow-auto">
-      <div v-if="tab === 'main'" class="view relative">
+      <div v-if="ui.tab === 'main'" class="view relative">
         <div class="x">
           <Loader :ui="ui" :buffers="buffers" />
           <Assign
@@ -248,14 +248,19 @@ const inModalMutegroup = computed(() => {
           @openModal="opanModal"
         />
       </div>
-      <div v-if="tab === 'sequencer'" class="seq">
+      <div v-if="ui.tab === 'sequencer'" class="seq">
         <Sequencer :ui="ui" :buffers="buffers" :samples="samples" />
       </div>
-      <div v-if="tab === 'filter'" class="filter">
+      <div v-if="ui.tab === 'filter'" class="filter">
         <Effects :effect="effect" />
       </div>
-      <div v-if="tab === 'harmonic'" class="">
-        <p>Harmonic for _</p>
+      <div v-if="ui.tab === 'harmonic'" class="">
+        <Harmonic
+          :harmonic="harmonic"
+          :samples="samples"
+          :buffers="buffers"
+          @select="(x) => (harmonic = x)"
+        />
       </div>
     </div>
 

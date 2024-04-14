@@ -34,6 +34,7 @@ export type SamplesT = {
 export type Ui = {
   sample: SampleT | null;
   modal: { type: string; value?: string } | null;
+  tab: Tabs;
   assignBuffer: string;
   edit: "begin" | "end" | null;
   loading: boolean;
@@ -70,16 +71,20 @@ export function useKeyboard(
   // settings: Ref<Settings>
 ) {
   const keydown = (ev: KeyboardEvent) => {
-    const { key } = ev;
-
     // modal keys are handled elsewhere
     if (ui.value.modal) return;
 
+    const { key } = ev;
+
     //  play sample
-    if (isSampleKey(key)) {
+    // if (isSampleKey(key)) {
+    const sample = samples.value[key];
+
+    if (sample) {
+      //  dont play : ctrl key, held, or during harmonic
       if (ev.ctrlKey) return;
-      const sample = samples.value[key];
-      if (!sample || sample?.pressed) return;
+      if (sample?.pressed) return;
+      if (ui.value.tab === "harmonic") return;
 
       const buffer = buffers.value[sample.bufferid];
       playSample(sample, buffer);
@@ -90,7 +95,21 @@ export function useKeyboard(
       return;
     }
 
-    // sample edit
+    // Esc key - close
+    if (ui.value.sample) {
+      if (key === "Escape") {
+        ui.value.sample = null;
+        ui.value.edit = null;
+      }
+    }
+
+    // Space - stop
+    if (key === " ") {
+      stopAllSamples(samples.value, buffers.value);
+      ev.preventDefault();
+    }
+
+    // sample edit arrow keys
     if (ui.value.edit && key.startsWith("Arrow")) {
       const sample = ui.value.sample;
       const edit = ui.value.edit;
@@ -115,19 +134,6 @@ export function useKeyboard(
       if (edit === "end" && next < sample.begin) next = sample.begin;
 
       sample[edit] = next;
-      ev.preventDefault();
-    }
-
-    // close sample
-    if (ui.value.sample) {
-      if (key === "Escape") {
-        ui.value.sample = null;
-        ui.value.edit = null;
-      }
-    }
-
-    if (key === " ") {
-      stopAllSamples(samples.value, buffers.value);
       ev.preventDefault();
     }
   };
@@ -182,6 +188,7 @@ export const refUi = () =>
   ref<Ui>({
     sample: null,
     modal: null,
+    tab: "main",
     assignBuffer: "",
     edit: null,
     loading: false,
@@ -196,15 +203,8 @@ export const refSettings = () =>
     openView: "always",
   });
 
-export const tabs = [
-  "main",
-  "view",
-  "sequencer",
-  "filter",
-  "harmonic",
-] as const;
-export type Tabs = (typeof tabs)[number] | null;
-export const refTab = (initial: Tabs) => ref<Tabs>(initial);
+export const tabs = ["main", "sequencer", "filter", "harmonic"] as const;
+export type Tabs = (typeof tabs)[number];
 
 export type Effect = {
   filter: {
