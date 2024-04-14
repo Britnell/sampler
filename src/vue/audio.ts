@@ -137,9 +137,10 @@ export const playSample = (sample: SampleT, buffer: AudioBuffer | null) => {
   }
 };
 
-export const stopSample = (sample: SampleT) => {
+export const stopSample = (sample: SampleT | string) => {
   try {
-    sources[sample.key]?.stop();
+    if (typeof sample === "string") sources[sample]?.stop();
+    else sources[sample.key]?.stop();
   } catch (e) {
     //
   }

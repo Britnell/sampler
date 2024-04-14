@@ -18,6 +18,7 @@ import {
   refTab,
   refEffect,
   isSampleKey,
+  tabs,
 } from "./hooks";
 import { samplesDbRemove } from "./indexdb";
 import {
@@ -95,22 +96,47 @@ const keydown = (ev: KeyboardEvent) => {
     return;
   }
   if (ui.value.modal?.type === "move") {
-    if (!isSampleKey(key)) return;
-    if (ui.value.sample && !samples.value[key]) {
-      stopSample(ui.value.sample);
-      samples.value[key] = { ...ui.value.sample, key };
-      samples.value[ui.value.sample.key] = null;
-      closeModal();
-      ui.value.sample = samples.value[key];
+    // 1st choose A to swap
+    if (!ui.value.modal.value) {
+      const sm = samples.value[key];
+      if (sm) ui.value.modal.value = key;
+      return;
     }
+
+    // 2nd swap A with key B
+    if (!isSampleKey(key)) return;
+
+    const a = ui.value.modal.value;
+    const b = key;
+    stopSample(a);
+    stopSample(b);
+
+    const smpa = samples.value[a];
+    const smpb = samples.value[b];
+    if (!smpa) return;
+    let swap;
+    samples.value[b] = { ...smpa, key: b };
+    if (smpb) samples.value[a] = { ...smpb, key: a };
+    else samples.value[a] = null;
+    closeModal();
+    ui.value.sample = samples.value[b];
+
     return;
   }
   if (ui.value.modal.type === "remove") {
-    if (key === ui.value.sample?.key) {
-      stopSample(ui.value.sample);
+    if (!ui.value.modal.value) {
+      const sm = samples.value[key];
+      if (sm) ui.value.modal.value = key;
+      return;
+    }
+    if (key === ui.value.modal.value) {
+      const smp = samples.value[key];
+      if (!smp) return;
+      stopSample(smp);
       samples.value[key] = null;
       ui.value.sample = null;
-      closeModal();
+      ui.value.modal.value = undefined;
+      // closeModal();
     }
     return;
   }
@@ -177,7 +203,7 @@ const inModalMutegroup = computed(() => {
     </div>
     <div class="flex gap-4 border-b border-white">
       <button
-        v-for="t in (['main','filter','sequencer'] as const)"
+        v-for="t in tabs"
         class="border border-white px-2 py-1"
         :class="t === tab ? ' bg-white text-black ' : ''"
         @click="tab = t"
@@ -197,6 +223,7 @@ const inModalMutegroup = computed(() => {
             @assign="(key) => opanModal('assign', key)"
             @delete="(key) => opanModal('deletebuffer', key)"
           />
+
           <section class="p-6">
             <h2 class="text-xl font-bold">Mute groups</h2>
             <div>
@@ -227,6 +254,9 @@ const inModalMutegroup = computed(() => {
       <div v-if="tab === 'filter'" class="filter">
         <Effects :effect="effect" />
       </div>
+      <div v-if="tab === 'harmonic'" class="">
+        <p>Harmonic for _</p>
+      </div>
     </div>
 
     <Keyboard
@@ -239,10 +269,21 @@ const inModalMutegroup = computed(() => {
     <section>
       <Modal :isOpen="ui.modal?.type" @close="ui.modal = null">
         <p v-if="ui.modal?.type === 'assign'">press a key to ASSIGN</p>
+
         <p v-if="ui.modal?.type === 'copy'">press a key to COPY to</p>
-        <p v-if="ui.modal?.type === 'move'">press a key to MOVE to</p>
+        <p v-if="ui.modal?.type === 'move'">
+          <span v-if="ui.modal.value">
+            Swap sample {{ ui.modal.value }} with _ ?
+          </span>
+          <span v-else> Choose sample to move </span>
+        </p>
         <p v-if="ui.modal?.type === 'splice'">press a key to SPLICE to</p>
-        <p v-if="ui.modal?.type === 'remove'">confirm key to delete it</p>
+        <p v-if="ui.modal?.type === 'remove'">
+          <span v-if="ui.modal.value">
+            confirm sample key to delete it : {{ ui.modal.value }}
+          </span>
+          <span v-else> Choose sample to remove </span>
+        </p>
         <p v-if="ui.modal?.type === 'deletebuffer'">
           Press ENTER to remove source
         </p>

@@ -196,7 +196,14 @@ export const refSettings = () =>
     openView: "always",
   });
 
-type Tabs = "main" | "view" | "sequencer" | "filter" | null;
+export const tabs = [
+  "main",
+  "view",
+  "sequencer",
+  "filter",
+  "harmonic",
+] as const;
+export type Tabs = (typeof tabs)[number] | null;
 export const refTab = (initial: Tabs) => ref<Tabs>(initial);
 
 export type Effect = {
