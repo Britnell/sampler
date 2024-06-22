@@ -98,32 +98,34 @@ const keydown = (ev: KeyboardEvent) => {
   if (ui.value.modal?.type === "move") {
     // 1st choose A to swap
     if (!ui.value.modal.value) {
+      if (!isSampleKey(key)) return;
       const sm = samples.value[key];
       if (sm) ui.value.modal.value = key;
       return;
     }
 
     // 2nd swap A with key B
-    if (!isSampleKey(key)) return;
-
-    const a = ui.value.modal.value;
-    const b = key;
-    stopSample(a);
-    stopSample(b);
-
-    const smpa = samples.value[a];
-    const smpb = samples.value[b];
-    if (!smpa) return;
+    const keya = ui.value.modal.value;
+    const keyb = key;
+    stopSample(keya);
+    stopSample(keyb);
+    const smpa = samples.value[keya];
+    const smpb = samples.value[keyb];
     let swap;
-    samples.value[b] = { ...smpa, key: b };
-    if (smpb) samples.value[a] = { ...smpb, key: a };
-    else samples.value[a] = null;
-    closeModal();
-    ui.value.sample = samples.value[b];
-
+    samples.value[keyb] = smpa ? { ...smpa, key: keyb } : null;
+    samples.value[keya] = smpb ? { ...smpb, key: keya } : null;
+    // closeModal();
+    ui.value.modal.value = null
+    ui.value.sample = samples.value[keyb];
     return;
   }
   if (ui.value.modal.type === "remove") {
+    console.log({key});
+    if(['Enter',' '].includes(key)){
+      closeModal();
+      return
+    }
+    
     if (!ui.value.modal.value) {
       const sm = samples.value[key];
       if (sm) ui.value.modal.value = key;
@@ -136,7 +138,6 @@ const keydown = (ev: KeyboardEvent) => {
       samples.value[key] = null;
       ui.value.sample = null;
       ui.value.modal.value = undefined;
-      // closeModal();
     }
     return;
   }
@@ -145,8 +146,9 @@ const keydown = (ev: KeyboardEvent) => {
     if (ui.value.sample && !samples.value[key]) {
       const copy = { ...ui.value.sample, key };
       if (copy.end) {
+        const len = copy.end - copy.begin
         copy.begin = copy.end;
-        copy.end = copy.begin + 0.6;
+        copy.end = copy.begin + len;
       } else copy.begin = copy.begin + 0.6;
       samples.value[key] = copy;
       closeModal();
