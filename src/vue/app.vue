@@ -26,6 +26,9 @@ import {
   setPassFilter,
   enableDelay,
   stopSample,
+  startRecording,
+  stopRecording,
+  saveAudioFile,
 } from "./audio";
 
 const buffers = refBuffers();
@@ -111,11 +114,10 @@ const keydown = (ev: KeyboardEvent) => {
     stopSample(keyb);
     const smpa = samples.value[keya];
     const smpb = samples.value[keyb];
-    let swap;
     samples.value[keyb] = smpa ? { ...smpa, key: keyb } : null;
     samples.value[keya] = smpb ? { ...smpb, key: keya } : null;
     // closeModal();
-    ui.value.modal.value = null
+    ui.value.modal.value = undefined
     ui.value.sample = samples.value[keyb];
     return;
   }
@@ -197,6 +199,13 @@ const inModalMutegroup = computed(() => {
     .filter((s) => s?.mutegroup === group)
     .map((s) => s?.key);
 });
+
+const finish = async ()=>{
+  const blob = await stopRecording()
+  console.log(blob);
+  // const playbackuri = await blobToDataURL(blob)
+  saveAudioFile(blob )  
+}
 </script>
 <template>
   <header class="max-w-[1000px] mx-auto px-8">
@@ -263,6 +272,11 @@ const inModalMutegroup = computed(() => {
           :buffers="buffers"
           @select="(x) => (harmonic = x)"
         />
+      </div>
+      <div v-if="ui.tab==='record'" class="">
+        RECORD
+        <button class="primary " @click="startRecording">Start</button>
+        <button class="primary " @click="finish">Stop</button>
       </div>
     </div>
 

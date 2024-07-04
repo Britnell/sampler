@@ -8,6 +8,7 @@ import {
 } from "vue";
 import {
   playSample,
+  setupRecording,
   stopAllSamples,
   stopMutegroup,
   stopSampleReload,
@@ -162,6 +163,7 @@ export function useKeyboard(
 
   watchEffect(() => {
     // auto load samples
+    // setupRecording()
     Object.values(samples.value).forEach((sample) => {
       if (!sample) return;
       const buffer = buffers.value[sample.bufferid];
@@ -203,7 +205,7 @@ export const refSettings = () =>
     openView: "always",
   });
 
-export const tabs = ["main", "sequencer", "filter", "harmonic"] as const;
+export const tabs = ["main", "sequencer", "filter", "harmonic", 'record'] as const;
 export type Tabs = (typeof tabs)[number];
 
 export type Effect = {
